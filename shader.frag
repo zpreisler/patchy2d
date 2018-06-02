@@ -1,7 +1,8 @@
 #version 450 core
 out vec4 out_color;
 
-in vec4 col;
+uniform dvec2 box;
+in vec4 geom_color;
 in vec2 uv;
 
 void main(){
@@ -10,7 +11,7 @@ void main(){
 		out_color=vec4(1.0,0.0,0.0,0.1);
 	}
 	else if(dist<1.0){
-		out_color=vec4(col.xyz,0.9);
+		out_color=vec4(geom_color.xyz,0.9);
 	}
 	else{
 		out_color=vec4(1.0,0.0,1.0,0.0);
