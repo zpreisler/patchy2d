@@ -73,7 +73,7 @@ unsigned int create_program(char *path_vertex_shader,char *path_geometry_shader,
 	//Return program
 	return program;
 }
-void glslInfo(){
+void glsl_info(){
 	printf("VENDOR: %s\n",glGetString(GL_VENDOR));
 	printf("RENDERER: %s\n",glGetString(GL_RENDERER));
 	printf("VERSION: %s\n",glGetString(GL_VERSION));

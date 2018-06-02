@@ -22,7 +22,7 @@ void mySDLresize(mySDL *s){
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
 	glUniformMatrix2fv(s->view_matrix_loc,1,GL_FALSE,s->view_matrix);
 }
-mySDL *mySDLInit(){
+mySDL *mySDLinit(){
 	//Allocate
 	mySDL *s=alloc(sizeof(mySDL));
 	s->proj_matrix=alloc(sizeof(float)*4);
@@ -49,6 +49,29 @@ mySDL *mySDLInit(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	//Print graphics card info
-	glslInfo();
+	glsl_info();
 	return s;
+}
+void mySDLpositions(mySDL *s,double *p,int n){
+	//write positions
+	glBindVertexArray(s->vao[0]);
+	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[0]); //Select buffer
+	//write to layout 0
+	glBufferData(GL_ARRAY_BUFFER,sizeof(double)*n,p,GL_STREAM_DRAW); //Write into the buffer
+	glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,0,0);
+	glEnableVertexAttribArray(0);
+}
+void mySDLcolors(mySDL *s,float *c,int n){
+	//write_colors
+	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[1]); //Select buffer
+	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n,c,GL_STREAM_DRAW); //Write into the buffer
+	//write to layout 1
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,0,0);
+	glEnableVertexAttribArray(1);
+}
+void mySDLdisplay(mySDL *s){
+	glClearColor(1.0,1.0,1.0,1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glDrawArrays(GL_POINTS,0,1);
+	SDL_GL_SwapWindow(s->window);
 }
