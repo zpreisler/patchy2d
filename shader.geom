@@ -6,9 +6,10 @@ in vec4 vertex_color[1];
 out vec4 geom_color;
 out vec2 uv;
 
-void main(){
-	vec2 a=vec2(1.0,1.0);
+uniform mat2 proj_matrix;
 
+void main(){
+	vec2 a=vec2(1.0,1.0)*proj_matrix;
 	geom_color=vertex_color[0];
 	uv=vec2(-1.0,-1.0);
 	gl_Position = gl_in[0].gl_Position + vec4(a*uv,0.0,0.0);

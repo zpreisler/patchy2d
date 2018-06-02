@@ -7,7 +7,7 @@ INSTALL=install -m 111
 BINDIR=$(HOME)/bin/
 
 MAIN=main.c
-SOURCES=program_gl.c
+SOURCES=program_gl.c mySDL.c
 OBJS=$(SOURCES:.c=.o)
 DEPS=$(SOURCES:.c=.h)
 
@@ -19,7 +19,7 @@ main: $(MAIN) $(OBJS)
 	$(CC) $(CFLAGS) $(MAIN) $(OBJS) -o $(EXEC) $(CLIBS) $(SDL_LIBS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@ $(CLIBS)
+	$(CC) $(CFLAGS) -c $< -o $@ $(CLIBS) $(SDL_LIBS)
 
 install:
 	$(INSTALL) $(EXEC) $(BINDIR)
