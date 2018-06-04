@@ -4,10 +4,28 @@
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
 #include <utils.h>
+#include "dSFMT.h"
 #include "program_gl.h"
 #include "mySDL.h"
+#include "init.h"
 #define MAX_SOURCE_SIZE 8096
+dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
+	//Initialize header
+	header *t=init_header();
+	dsfmt_init_gen_rand(&dsfmt,t->seed);
+	//Reading inputs
+	if(argc==1){
+		usage(stdout,t->argz,*argv);
+		return 0;
+	}
+	printf(">>>Initialized default header\n");
+	input_files *input=find_configurational_files(argc,argv);
+	read_input(argc,argv,input,t);
+	
+	dump_args(stdout,t->argz);
+
+	//Graphics
 	int quit=0;
 	float v[6]={0.5,0.0,1.5,0.0,2.5,0.0};
 	float color[12]={

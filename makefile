@@ -1,13 +1,13 @@
 CC=gcc
-CFLAGS=-O2 -Wall -Wextra
-CLIBS=-I $(HOME)/include -L $(HOME)/lib -lutils -lGL -lGLEW 
+CFLAGS=-O2 -Wall -Wextra -DHAVE_SSE2 -DDSFMT_MEXP=4253 -fomit-frame-pointer -DHAVE_SSE2 -msse -msse2 -msse3 -msse4 -msse4.1 -march='native'
+CLIBS=-I $(HOME)/include -L $(HOME)/lib -lutils -lGL -lGLEW  -lm
 SDL_LIBS=-lSDL2 -lSDL2main
 EXEC=sdl
 INSTALL=install -m 111
 BINDIR=$(HOME)/bin/
 
-MAIN=main.c
-SOURCES=program_gl.c mySDL.c
+MAIN=main.c dSFMT.c
+SOURCES=program_gl.c mySDL.c zargs.c params.c hash.c alloc.c init.c mm_math.c energy.c lists.c patches.c optimize.c
 OBJS=$(SOURCES:.c=.o)
 DEPS=$(SOURCES:.c=.h)
 
