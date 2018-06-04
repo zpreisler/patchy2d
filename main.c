@@ -6,19 +6,23 @@
 #include <utils.h>
 #include "program_gl.h"
 #include "mySDL.h"
-#define MAX_SOURCE_SIZE (0x100000)
+#define MAX_SOURCE_SIZE 8096
 int main(int argc, char *argv[]){
 	int quit=0;
-	double v[6]={0.0,0.0,1.0,1.0,0.5,0.5};
-	float color[]={
+	float v[6]={0.5,0.5,-0.1,-0.1,0.1,0.1};
+	float color[12]={
 		0.5,1.0,0.5,1.0,
 		0.5,1.0,0.75,1.0,
 		0.5,1.0,0.35,1.0
 	};
+	//float b[8]={0.5,1.0,0.0,0.0,1.0,1.0,1.0,0.0};
+	float b[8]={0.0,0.0,1.0,0.0,1.0,1.0,0.0,1.0};
 	mySDL *s=mySDLinit();
+	mySDLresize(s);
 	mySDLpositions(s,v,6);
 	mySDLcolors(s,color,12);
-	mySDLresize(s);
+	mySDLboundary(s,b,8);
+	mySDLdisplay(s);
 	while(!quit){
 		SDL_WaitEvent(&s->event);
 		switch(s->event.type){

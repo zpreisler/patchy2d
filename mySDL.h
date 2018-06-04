@@ -6,8 +6,8 @@ typedef struct mySDL{
 	SDL_Event event;
 	GLenum glew_status;
 	unsigned int program[2];
-	unsigned int vao[1];
-	unsigned int vbo[2];
+	unsigned int vao[2];
+	unsigned int vbo[3];
 	float *proj_matrix;
 	float *view_matrix;
 	unsigned int proj_matrix_loc;
@@ -17,7 +17,8 @@ typedef struct mySDL{
 }mySDL;
 extern void mySDLresize(mySDL *s);
 extern mySDL *mySDLinit();
-extern void mySDLpositions(mySDL *s,double *p,int n);
+extern void mySDLpositions(mySDL *s,float *p,int n);
 extern void mySDLcolors(mySDL *s,float *c,int n);
+extern void mySDLboundary(mySDL *s,float *b,int n);
 extern void mySDLdisplay(mySDL *s);
 #endif

@@ -9,7 +9,7 @@ out vec2 uv;
 uniform mat2 proj_matrix;
 
 void main(){
-	vec2 a=vec2(1.0,1.0)*proj_matrix;
+	vec2 a=vec2(0.5,0.5)*proj_matrix;
 	geom_color=vertex_color[0];
 	uv=vec2(-1.0,-1.0);
 	gl_Position = gl_in[0].gl_Position + vec4(a*uv,0.0,0.0);

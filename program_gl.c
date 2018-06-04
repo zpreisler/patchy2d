@@ -55,20 +55,26 @@ unsigned int create_program(char *path_vertex_shader,char *path_geometry_shader,
 	unsigned int vertex_shader,geometry_shader,fragment_shader;
 	//Load shaders
 	vertex_shader=load_compile_shader(path_vertex_shader,GL_VERTEX_SHADER);
-	geometry_shader=load_compile_shader(path_geometry_shader,GL_GEOMETRY_SHADER);
+	if(path_geometry_shader){
+		geometry_shader=load_compile_shader(path_geometry_shader,GL_GEOMETRY_SHADER);
+	}
 	fragment_shader=load_compile_shader(path_fragment_shader,GL_FRAGMENT_SHADER);
 	//Create program
 	program=glCreateProgram();
 	//Attach shaders
 	glAttachShader(program,vertex_shader);
-	glAttachShader(program,geometry_shader);
+	if(path_geometry_shader){
+		glAttachShader(program,geometry_shader);
+	}
 	glAttachShader(program,fragment_shader);
 	//Link program
 	glLinkProgram(program);
-	glUseProgram(program);
+	//glUseProgram(program);
 	//Clean up
 	glDeleteShader(vertex_shader);
-	glDeleteShader(geometry_shader);
+	if(path_geometry_shader){
+		glDeleteShader(geometry_shader);
+	}
 	glDeleteShader(fragment_shader);
 	//Return program
 	return program;
