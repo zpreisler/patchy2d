@@ -9,14 +9,13 @@
 #define MAX_SOURCE_SIZE 8096
 int main(int argc, char *argv[]){
 	int quit=0;
-	float v[6]={0.5,0.5,-0.1,-0.1,0.1,0.1};
+	float v[6]={0.5,0.0,1.5,0.0,2.5,0.0};
 	float color[12]={
 		0.5,1.0,0.5,1.0,
 		0.5,1.0,0.75,1.0,
 		0.5,1.0,0.35,1.0
 	};
-	//float b[8]={0.5,1.0,0.0,0.0,1.0,1.0,1.0,0.0};
-	float b[8]={0.0,0.0,1.0,0.0,1.0,1.0,0.0,1.0};
+	float b[8]={0.0,0.0,4.0,0.0,4.0,4.0,0.0,4.0};
 	mySDL *s=mySDLinit();
 	mySDLresize(s);
 	mySDLpositions(s,v,6);

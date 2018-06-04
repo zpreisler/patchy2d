@@ -15,9 +15,11 @@ void mySDLresize(mySDL *s){
 	a=(float)s->h/(float)s->w;
 	if(a>1.0){
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
+		s->view_matrix=(float[4]){-1.0,-1.0,5.0,5.0};
 	}
 	else{
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
+		s->view_matrix=(float[4]){-1.0,-1.0,5.0,5.0};
 	}
 	glUseProgram(s->program[0]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
