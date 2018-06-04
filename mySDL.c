@@ -8,18 +8,19 @@
 #include "mySDL.h"
 #define MAX_SOURCE_SIZE (0x100000)
 void mySDLresize(mySDL *s){
+	//Routines for window resizing
 	float a;
-	float m=1.0;
+	float m=s->scale;
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	glViewport(0,0,s->w,s->h);
 	a=(float)s->h/(float)s->w;
 	if(a>1.0){
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
-		s->view_matrix=(float[4]){-1.0,-1.0,5.0,5.0};
+		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
 	}
 	else{
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
-		s->view_matrix=(float[4]){-1.0,-1.0,5.0,5.0};
+		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
 	}
 	glUseProgram(s->program[0]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
@@ -34,6 +35,7 @@ mySDL *mySDLinit(){
 	mySDL *s=alloc(sizeof(mySDL));
 	s->proj_matrix=alloc(sizeof(float)*4);
 	s->view_matrix=alloc(sizeof(float)*4);
+	s->box=alloc(sizeof(float)*8);
 	//Generate program
 	SDL_Init(SDL_INIT_VIDEO);
 	//Define window
@@ -89,6 +91,7 @@ void mySDLboundary(mySDL *s,float *b,int n){
 	glEnableVertexAttribArray(0);
 }
 void mySDLdisplay(mySDL *s){
+	//Draw particles and the boundary
 	//Clear
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);

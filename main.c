@@ -15,12 +15,13 @@ int main(int argc, char *argv[]){
 		0.5,1.0,0.75,1.0,
 		0.5,1.0,0.35,1.0
 	};
-	float b[8]={0.0,0.0,4.0,0.0,4.0,4.0,0.0,4.0};
 	mySDL *s=mySDLinit();
+	s->box=(float[8]){0.0,0.0,4.0,0.0,4.0,4.0,0.0,4.0};
+	s->scale=s->box[4]/(s->box[4]+1.0);
 	mySDLresize(s);
 	mySDLpositions(s,v,6);
 	mySDLcolors(s,color,12);
-	mySDLboundary(s,b,8);
+	mySDLboundary(s,s->box,8);
 	mySDLdisplay(s);
 	while(!quit){
 		SDL_WaitEvent(&s->event);

@@ -12,7 +12,8 @@ typedef struct mySDL{
 	float *view_matrix;
 	unsigned int proj_matrix_loc;
 	unsigned int view_matrix_loc;
-	float box_offset[4];
+	float *box;
+	float scale;
 	int w,h;
 }mySDL;
 extern void mySDLresize(mySDL *s);
