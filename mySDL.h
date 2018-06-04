@@ -18,8 +18,8 @@ typedef struct mySDL{
 }mySDL;
 extern void mySDLresize(mySDL *s);
 extern mySDL *mySDLinit();
-extern void mySDLpositions(mySDL *s,float *p,int n);
+extern void mySDLpositions(mySDL *s,double *p,int n);
 extern void mySDLcolors(mySDL *s,float *c,int n);
-extern void mySDLboundary(mySDL *s,float *b,int n);
+extern void mySDLboundary(mySDL *s,float *b);
 extern void mySDLdisplay(mySDL *s);
 #endif

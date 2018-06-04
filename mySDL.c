@@ -63,13 +63,13 @@ mySDL *mySDLinit(){
 	glsl_info();
 	return s;
 }
-void mySDLpositions(mySDL *s,float *p,int n){
+void mySDLpositions(mySDL *s,double *p,int n){
 	//write positions
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[0]); //Select buffer
 	//write to layout 0
-	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n,p,GL_STREAM_DRAW); //Write into the buffer
-	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(double)*n*2,p,GL_STREAM_DRAW); //Write into the buffer
+	glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,0,0);
 	glEnableVertexAttribArray(0);
 }
 void mySDLcolors(mySDL *s,float *c,int n){
@@ -81,12 +81,12 @@ void mySDLcolors(mySDL *s,float *c,int n){
 	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(1);
 }
-void mySDLboundary(mySDL *s,float *b,int n){
+void mySDLboundary(mySDL *s,float *b){
 	//write positions
 	glBindVertexArray(s->vao[1]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[3]); //Select buffer
 	//write to layout 0
-	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n,b,GL_STREAM_DRAW); //Write into the buffer
+	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*8,b,GL_STREAM_DRAW); //Write into the buffer
 	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(0);
 }
