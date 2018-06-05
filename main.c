@@ -27,23 +27,25 @@ int main(int argc, char *argv[]){
 
 	//Graphics
 	int quit=0;
-	double v[6]={0.5,0.0,1.5,0.0,2.5,0.0};
-	float color[12]={
-		0.5,1.0,0.5,1.0,
-		0.5,1.0,0.75,1.0,
-		0.5,1.0,0.35,1.0
-	};
+	float color[4]={0.5,1.0,0.5,1.0};
 	mySDL *s=mySDLinit();
+
+	s->positions=alloc(sizeof(float)*2*t->N);
+	s->colors=alloc(sizeof(float)*4*t->N);
+	s->n=t->N;
+	m128d2float(t->p->q,s->positions,s->n);
+	mySDLsetcolor(s->colors,color,s->n);
+
 	s->box=(float[8]){0.0,0.0,4.0,0.0,4.0,4.0,0.0,4.0};
 	s->scale=s->box[4]/(s->box[4]+1.0);
 	mySDLresize(s);
-	mySDLpositions(s,(double*)t->p->q,3);
-	for(int i=0;i<3;i++){
-		printf("%lf %lf\n",(t->p->q)[0],(t->p->q)[1]);
-	}
-	mySDLcolors(s,color,12);
+
+	mySDLpositions(s,s->positions,s->n);
+	mySDLcolors(s,s->colors,s->n);
 	mySDLboundary(s,s->box);
+
 	mySDLdisplay(s);
+
 	while(!quit){
 		SDL_WaitEvent(&s->event);
 		switch(s->event.type){

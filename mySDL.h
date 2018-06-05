@@ -15,11 +15,17 @@ typedef struct mySDL{
 	float *box;
 	float scale;
 	int w,h;
+	//Objects
+	float *positions;
+	float *colors;
+	int n;
 }mySDL;
 extern void mySDLresize(mySDL *s);
 extern mySDL *mySDLinit();
-extern void mySDLpositions(mySDL *s,double *p,int n);
+extern void mySDLpositions(mySDL *s,float *p,int n);
 extern void mySDLcolors(mySDL *s,float *c,int n);
 extern void mySDLboundary(mySDL *s,float *b);
 extern void mySDLdisplay(mySDL *s);
+extern void m128d2float(__m128d *a,float *b,int n);
+extern void mySDLsetcolor(float *b,float *color,int n);
 #endif

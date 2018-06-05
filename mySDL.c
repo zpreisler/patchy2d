@@ -63,13 +63,13 @@ mySDL *mySDLinit(){
 	glsl_info();
 	return s;
 }
-void mySDLpositions(mySDL *s,double *p,int n){
+void mySDLpositions(mySDL *s,float *p,int n){
 	//write positions
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[0]); //Select buffer
 	//write to layout 0
-	glBufferData(GL_ARRAY_BUFFER,sizeof(double)*n*2,p,GL_STREAM_DRAW); //Write into the buffer
-	glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,0,0);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n*2,p,GL_STREAM_DRAW); //Write into the buffer
+	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(0);
 }
 void mySDLcolors(mySDL *s,float *c,int n){
@@ -77,7 +77,7 @@ void mySDLcolors(mySDL *s,float *c,int n){
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[1]); //Select buffer
 	//write to layout 1
-	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n,c,GL_STREAM_DRAW); //Write into the buffer
+	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*4*n,c,GL_STREAM_DRAW); //Write into the buffer
 	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(1);
 }
@@ -98,7 +98,7 @@ void mySDLdisplay(mySDL *s){
 	//Draw
 	glUseProgram(s->program[0]);
 	glBindVertexArray(s->vao[0]);
-	glDrawArrays(GL_POINTS,0,3);
+	glDrawArrays(GL_POINTS,0,s->n);
 	//Draw
 	glUseProgram(s->program[1]);
 	glBindVertexArray(s->vao[1]);
@@ -106,4 +106,23 @@ void mySDLdisplay(mySDL *s){
 	glDrawArrays(GL_LINE_LOOP,0,4);
 
 	SDL_GL_SwapWindow(s->window);
+}
+void m128d2float(__m128d *a,float *b,int n){
+	int i,j;
+	double *c;
+	for(i=0;i<n;i++){
+		j=2*i;
+		c=(double*)(a+i);
+		*(b+j)=(float)c[0];
+		*(b+j+1)=(float)c[1];
+	}
+}
+void mySDLsetcolor(float *b,float *color,int n){
+	int i,j,k;
+	for(i=0;i<n;i++){
+		j=i*4;
+		for(k=0;k<4;k++){
+			*(b+j+k)=*(color+k);
+		}
+	}
 }
