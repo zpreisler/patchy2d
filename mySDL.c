@@ -17,10 +17,12 @@ void mySDLresize(mySDL *s){
 	if(a>1.0){
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
 		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
+		//s->view_matrix=(float[4]){-s->box[4],0,s->box[5]-s->box[4],s->box[5]};
 	}
 	else{
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
 		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
+		//s->view_matrix=(float[4]){-s->box[4],0,s->box[5]-s->box[4],s->box[5]};
 	}
 	glUseProgram(s->program[0]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);

@@ -8,6 +8,7 @@
 #include "program_gl.h"
 #include "mySDL.h"
 #include "init.h"
+#include "run.h"
 #define MAX_SOURCE_SIZE 8096
 dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]){
 	dump_args(stdout,t->argz);
 
 	//Graphics
-	int quit=0;
+	//int quit=0;
 	float color[4]={0.5,1.0,0.5,1.0};
 	mySDL *s=mySDLinit();
 
@@ -36,30 +37,18 @@ int main(int argc, char *argv[]){
 	m128d2float(t->p->q,s->positions,s->n);
 	mySDLsetcolor(s->colors,color,s->n);
 
-	s->box=(float[8]){0.0,0.0,4.0,0.0,4.0,4.0,0.0,4.0};
+	s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
 	s->scale=s->box[4]/(s->box[4]+1.0);
-	mySDLresize(s);
 
+	mySDLresize(s);
 	mySDLpositions(s,s->positions,s->n);
 	mySDLcolors(s,s->colors,s->n);
 	mySDLboundary(s,s->box);
 
 	mySDLdisplay(s);
 
-	while(!quit){
-		SDL_WaitEvent(&s->event);
-		switch(s->event.type){
-			case SDL_QUIT:
-				quit=1;
-				break;
-			case SDL_WINDOWEVENT:
-				if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
-					mySDLresize(s);
-				}
-				break;
-		}
-		mySDLdisplay(s);
-	}
+	run(t,s);
+
 	SDL_Quit();
 
 	save_configuration(t->name,t);
