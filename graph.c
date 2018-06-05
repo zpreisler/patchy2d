@@ -3,6 +3,7 @@
 #include <utils.h>
 #include "zargs.h"
 #include "graph.h"
+//Calculates connectivity graphs
 int init_path(path *p,int size){
 	int i;
 	p->pleft=(path**)alloc(sizeof(path*)*size);
