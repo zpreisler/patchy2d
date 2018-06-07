@@ -19,6 +19,7 @@
 #include "graph.h"
 #include "optimize.h"
 #include "canonical.h"
+#include "grand_canonical.h"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -115,13 +116,17 @@ int run(header *t,mySDL *s){
 		}
 		//Monte Carlo cycle
 		for(ncycle=0;ncycle<2*t->N;ncycle++){
-			//2*ncycles -- one for rotation and one for translation
+			//Translation and Rotation
 			q=rnd_particle(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
 				acc_move[mc_move(q,t,&energy)]++;	
 			}
 			else{
 				acc_rotate[mc_rotate(q,t,&energy)]++;
+			}
+			// Grand canonical moves
+			if(0.01<dsfmt_genrand_open_open(&dsfmt)){
+				mc_gc(t,&energy);
 			}
 		}
 		if(!(i%(t->mod*t->pmod))){
@@ -137,6 +142,7 @@ int run(header *t,mySDL *s){
 				print_nvt_log(stdout,t,i,difftime(t2,t1),energy,frac);
 			}
 			//Update screen
+			s->n=t->N;
 			m128d2float(t->p->q,s->positions,s->n);
 			mySDLpositions(s,s->positions,s->n);
 			//mySDLcolors(s,s->colors,s->n);

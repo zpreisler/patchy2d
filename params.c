@@ -4,11 +4,11 @@
 #include <time.h>
 #include "zargs.h"
 #include "params.h"
-mpi_world *init_mpi_world(void){
+/*mpi_world *init_mpi_world(void){
 	mpi_world *mpi=(mpi_world*)alloc(sizeof(mpi_world));
 	mpi->seed=SEED;
 	return mpi;
-}
+}*/
 header *init_header(void){
 	//Initialize header wit hdefualt values
 	header *t=(header*)alloc(sizeof(header));

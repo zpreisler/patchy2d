@@ -18,9 +18,9 @@
 #include "graph.h"
 #include "optimize.h"
 #include "canonical.h"
-#include "postscript.h"
+//#include "postscript.h"
 extern dsfmt_t dsfmt;
-extern dsfmt_t mpi_dsfmt;
+/*extern dsfmt_t mpi_dsfmt;
 static volatile sig_atomic_t gc_safe_exit=0;
 void signal_safe_exit_gc(int sig){
 	gc_safe_exit=1;
@@ -30,7 +30,7 @@ void signal_safe_exit_gc_int(int sig){
 	gc_safe_exit=1;
 	printf("\n ["RED"terminating"RESET"] [signal %d]\n",sig);
 	signal(sig,SIG_DFL);
-}
+}*/
 int pre_insert_particle(header *t,particle *q,int *en){
 	double a=2.0*M_PI*dsfmt_genrand_open_open(&dsfmt);
 	*(q)->q=t->box*rnd11();	
@@ -153,6 +153,7 @@ int print_n_species(FILE *f,header *t){
 	fprintf(f,"\n");
 	return 0;
 }
+/*
 int grand_canonical(mpi_world *mpi __attribute__((unused)),header *t){
 	long long int i;
 	unsigned int ncycle;
@@ -352,4 +353,4 @@ int grand_canonical_n(mpi_world *mpi __attribute__((unused)),header *t){
 	checksum(stdout,t,energy);
 	t->steps_passed=i;
 	return 0;
-}
+}*/

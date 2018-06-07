@@ -27,7 +27,6 @@ int main(int argc, char *argv[]){
 	dump_args(stdout,t->argz);
 
 	//Graphics
-	//int quit=0;
 	float color[4]={0.5,1.0,0.5,1.0};
 	mySDL *s=mySDLinit();
 

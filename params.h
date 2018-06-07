@@ -4,7 +4,7 @@
 #define SEED 1346
 #define MPI_SEED 913
 #include "zargs.h"
-typedef struct mpi_world{
+/*typedef struct mpi_world{
 	int numtasks;
 	int rank;
 	int length;
@@ -13,12 +13,12 @@ typedef struct mpi_world{
 	unsigned int seed;
 	int waiting_for_reply_from;
 	int blocked;
-}mpi_world;
+}mpi_world;*/
 typedef struct input_files{
 	int n;
 	FILE **f;
 	char **file;
 }input_files;
-extern mpi_world *init_mpi_world(void);
+//extern mpi_world *init_mpi_world(void);
 extern header *init_header(void);
 #endif
