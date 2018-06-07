@@ -20,6 +20,7 @@
 #include "optimize.h"
 #include "canonical.h"
 #include "grand_canonical.h"
+#include "npt.h"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -81,16 +82,23 @@ int run(header *t,mySDL *s){
 	int energy=0;
 
 	FILE *fen=open_file2(t->name,".en","w");
+	FILE *frho=open_file2(t->name,".rho","w");
+	FILE *fvol=open_file2(t->name,".vol","w");
 	double en;
+	double rho;
+	double vol;
 	time_t t1,t2;
 
 	int acc_move[2]={0,0};
 	int acc_rotate[2]={0,0};
+	int acc_volume[2]={0,0};
+	int acc_volume_xy[2]={0,0};
+	int acc_shape[2]={0,0};
 	t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 
-	int *acc[]={acc_move,acc_rotate};
-	double *mmax[]={&(t->max_displacement[0]),&t->max_rotation};
-	double frac[2];
+	int *acc[]={acc_move,acc_rotate,acc_volume,acc_volume_xy,acc_shape};
+	double *mmax[]={&(t->max_displacement[0]),&t->max_rotation,&t->max_vol,&t->max_uy};
+	double frac[5];
 
 	signal(SIGINT,signal_safe_exit_int);
 	signal(SIGUSR1,signal_safe_exit);
@@ -128,16 +136,25 @@ int run(header *t,mySDL *s){
 			if(0.01<dsfmt_genrand_open_open(&dsfmt)){
 				mc_gc(t,&energy);
 			}
+			acc_volume_xy[mc_npt_xy(t,&energy)]++;
+			acc_shape[mc_uy(t,&energy)]++;
+			acc_volume[mc_npt(t,&energy)]++;
 		}
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);
 			en=(double)energy/(double)t->N;
 			uwrite(&en,sizeof(double),1,fen);
-			gfrac(acc,frac,2);
+			rho=(double)t->N/(t->box[0]*t->box[1]);
+			uwrite(&rho,sizeof(double),1,frho);
+			vol=(t->box[0]*t->box[1]);
+			uwrite(&vol,sizeof(double),1,fvol);
+			gfrac(acc,frac,5);
+
 			if(t->optimize){
-				optimize(mmax,frac,2);
+				optimize(mmax,frac,4);
 				t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 			}
+
 			if(t->verbose){
 				print_nvt_log(stdout,t,i,difftime(t2,t1),energy,frac);
 			}
@@ -145,8 +162,8 @@ int run(header *t,mySDL *s){
 			s->n=t->N;
 			m128d2float(t->p->q,s->positions,s->n);
 			mySDLpositions(s,s->positions,s->n);
-			//mySDLcolors(s,s->colors,s->n);
-			//mySDLboundary(s,s->box);
+			mySDLcolors(s,s->colors,s->n);
+			mySDLboundary(s,s->box);
 			mySDLdisplay(s);
 		}
 	}

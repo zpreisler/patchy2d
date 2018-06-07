@@ -20,9 +20,9 @@
 #include "canonical.h"
 #include "optimize.h"
 #include "init.h"
-#include "postscript.h"
+//#include "postscript.h"
 extern dsfmt_t dsfmt;
-extern dsfmt_t mpi_dsfmt;
+/*extern dsfmt_t mpi_dsfmt;
 static volatile sig_atomic_t safe_exit=0;
 void signal_safe_exit_npt(int sig){
 	safe_exit=1;
@@ -33,7 +33,7 @@ void signal_safe_exit_int_npt(int sig){
 	printf("\n ["RED"terminating"RESET"] [signal %d]\n",sig);
 	signal(sig,SIG_DFL);
 	return;
-}
+}*/
 int mc_npt(header *t,int *en){
 	unsigned int i;
 	int enn,eno,de;
@@ -289,6 +289,7 @@ void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
 }
+/*
 int npt(mpi_world *mpi __attribute__((unused)),header *t){
 	long long int i;
 	unsigned int ncycle;
@@ -566,4 +567,4 @@ int mpi_npt(mpi_world *mpi __attribute__((unused)),header *t){
 	t->steps_passed=i;
 	return 0;
 }
-
+*/

@@ -14,7 +14,7 @@ species *alloc_specie(void){
 	strcpy(s->patch_type,"symmetric");
 	s->patch_width=10.0;
 	s->npatch=0; //no patches
-	s->grand_canonical=0; //disabled
+	s->grand_canonical=1; //enabled by default
 	s->mu=0.0;
 	s->interaction_matrix=(double*)alloc(sizeof(double)*64);
 	s->angles=(double*)alloc(sizeof(double)*64);

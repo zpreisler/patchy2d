@@ -43,7 +43,6 @@ int main(int argc, char *argv[]){
 	mySDLpositions(s,s->positions,s->n);
 	mySDLcolors(s,s->colors,s->n);
 	mySDLboundary(s,s->box);
-
 	mySDLdisplay(s);
 
 	run(t,s);
