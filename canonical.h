@@ -9,4 +9,6 @@ extern int mc_move(particle *p,header *t,int *en);
 extern unsigned int rnd_rank(mpi_world *mpi);
 extern particle *rnd_particle(header *t);
 extern particle *rnd_specie(species *s);
+extern int mc_move(particle *p,header *t,int *en);
+extern int mc_rotate(particle *p,header *t,int *en);
 #endif

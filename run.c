@@ -50,66 +50,6 @@ particle *rnd_specie(species *s){
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->N);
 	return (particle*)s->p+rnd;
 }
-int mc_move(particle *p,header *t,int *en){
-	int eno=0,enn=0;
-	int de;
-	double rmd;
-	__m128d q0=*(p->q);
-	__m128d rnd=(__m128d){dsfmt_genrand_open_open(&dsfmt)-0.5,dsfmt_genrand_open_open(&dsfmt)-0.5};
-	__m128d dq=t->max_displacement*rnd;
-	dq[0]-=dq[1]*t->uy;
-	*(p->q)+=dq;
-	boundary(p->q,t->box);
-	hash_reinsert(p,t->h1,t->table);
-	eno=p->en_new;
-	list_swap(p);
-	if(overlap(p,t)){
-		*(p->q)=q0;
-		hash_reinsert(p,t->h1,t->table);
-		list_swap(p);
-		return 1;
-	}
-	enn=particle_energy_hash2(p);
-	de=enn-eno;
-	rmd=dsfmt_genrand_open_open(&dsfmt);
-	if(rmd<exp(t->epsilon*de)){
-		adjust_lists(p);
-		*en+=de;
-		return 0;
-	}
-	else{
-		*(p->q)=q0;
-		hash_reinsert(p,t->h1,t->table);
-		list_swap(p);
-		return 1;
-	}
-}
-int mc_rotate(particle *p,header *t,int *en){
-	int eno=0,enn=0;
-	int de;
-	double w=t->max_rotation*(dsfmt_genrand_open_open(&dsfmt)-0.5);
-	double rnd=dsfmt_genrand_open_open(&dsfmt);
-	__m128d or0=*p->or;
-	*p->or=rot2w(*p->or,w);
-	eno=p->en_new;
-	list_swap(p);
-	set_patches(p);
-	enn=particle_energy_hash(p,t);
-	de=enn-eno;
-	rnd=dsfmt_genrand_open_open(&dsfmt);
-	if(rnd<exp(t->epsilon*de)){
-		adjust_lists(p);
-		*en+=de;
-		return 0;
-	}
-	else{
-		*(p->or)=or0;
-		hash_reinsert(p,t->h1,t->table);
-		set_patches(p);
-		list_swap(p);
-		return 1;
-	}
-}
 void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
 	double vol=t->box[0]*t->box[1];
 	double rho=(double)t->N/vol;
@@ -133,7 +73,7 @@ void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			frac[0],frac[1]);
 }
 int run(header *t,mySDL *s){
-
+	//Main routine -- Running the simulation
 	long long int i;
 	unsigned int ncycle;
 	particle *q;
@@ -161,7 +101,7 @@ int run(header *t,mySDL *s){
 	//alloc_graph(t);
 	
 	for(i=1;!safe_exit&&i<t->step;i++){
-		//SDL sindow
+		//SDL sindow and polling events
 		SDL_PollEvent(&s->event);
 		switch(s->event.type){
 			case SDL_QUIT:
@@ -173,8 +113,9 @@ int run(header *t,mySDL *s){
 				}
 				break;
 		}
-
+		//Monte Carlo cycle
 		for(ncycle=0;ncycle<2*t->N;ncycle++){
+			//2*ncycles -- one for rotation and one for translation
 			q=rnd_particle(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
 				acc_move[mc_move(q,t,&energy)]++;	
@@ -194,14 +135,13 @@ int run(header *t,mySDL *s){
 			}
 			if(t->verbose){
 				print_nvt_log(stdout,t,i,difftime(t2,t1),energy,frac);
-
-				m128d2float(t->p->q,s->positions,s->n);
-				mySDLpositions(s,s->positions,s->n);
-				mySDLcolors(s,s->colors,s->n);
-				mySDLboundary(s,s->box);
-
-				mySDLdisplay(s);
 			}
+			//Update screen
+			m128d2float(t->p->q,s->positions,s->n);
+			mySDLpositions(s,s->positions,s->n);
+			//mySDLcolors(s,s->colors,s->n);
+			//mySDLboundary(s,s->box);
+			mySDLdisplay(s);
 		}
 	}
 	mySDLdisplay(s);

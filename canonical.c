@@ -4,7 +4,7 @@
 #include <math.h>
 #include <utils.h>
 #include <string.h>
-#include <mpi.h>
+//#include <mpi.h>
 #include <time.h>
 #include "dSFMT.h"
 #include "zargs.h"
@@ -15,13 +15,13 @@
 #include "lists.h"
 #include "init.h"
 #include "patches.h"
-#include "mpi.h"
+//#include "mpi.h"
 #include "graph.h"
 #include "optimize.h"
 #include "canonical.h"
-#include "postscript.h"
 extern dsfmt_t dsfmt;
-extern dsfmt_t mpi_dsfmt;
+//#include "postscript.h"
+/*extern dsfmt_t dsfmt;
 static volatile sig_atomic_t safe_exit=0;
 void signal_safe_exit(int sig){
 	safe_exit=1;
@@ -35,8 +35,8 @@ void signal_safe_exit_int(int sig){
 }
 unsigned int rnd_rank(mpi_world *mpi){
 	return (unsigned)(dsfmt_genrand_open_open(&mpi_dsfmt)*mpi->numtasks);
-}
-particle *rnd_particle(header *t){
+}*/
+/*particle *rnd_particle(header *t){
 	species *s=t->specie;
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*t->N);
 	while(s&&s->N<(rnd+1)){
@@ -48,7 +48,7 @@ particle *rnd_particle(header *t){
 particle *rnd_specie(species *s){
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->N);
 	return (particle*)s->p+rnd;
-}
+}*/
 int mc_move(particle *p,header *t,int *en){
 	int eno=0,enn=0;
 	int de;
@@ -109,6 +109,7 @@ int mc_rotate(particle *p,header *t,int *en){
 		return 1;
 	}
 }
+/*
 void mpi_send_receive_rank(mpi_world *mpi,int *send,int *receive){
 	*send=rnd_rank(mpi);
 	*send=0;
@@ -122,8 +123,8 @@ void assign_block(mpi_world *mpi,mpi_block *b,header *t,int energy,double rnd){
 	b->energy=energy;
 	b->epsilon=t->epsilon;
 	b->rnd=rnd;
-}
-void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
+}*/
+/*void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
 	double vol=t->box[0]*t->box[1];
 	double rho=(double)t->N/vol;
 	fprintf(f,UGREEN"NVT\n"RESET
@@ -144,7 +145,8 @@ void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			energy,(double)energy/t->N,rho,
 			t->max_displacement[0],t->max_rotation,
 			frac[0],frac[1]);
-}
+}*/
+/*
 int canonical(mpi_world *mpi __attribute__((unused)),header *t){
 	long long int i;
 	unsigned int ncycle;
@@ -362,3 +364,4 @@ int mpi_canonical(mpi_world *mpi __attribute__((unused)),header *t){
 	t->steps_passed=i;
 	return 0;
 }
+*/

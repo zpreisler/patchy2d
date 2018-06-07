@@ -7,7 +7,7 @@ INSTALL=install -m 111
 BINDIR=$(HOME)/bin/
 
 MAIN=main.c dSFMT.c
-SOURCES=program_gl.c mySDL.c zargs.c params.c hash.c alloc.c init.c mm_math.c energy.c lists.c patches.c optimize.c run.c
+SOURCES=program_gl.c mySDL.c zargs.c params.c hash.c alloc.c init.c mm_math.c energy.c lists.c patches.c optimize.c run.c canonical.c
 OBJS=$(SOURCES:.c=.o)
 DEPS=$(SOURCES:.c=.h)
 
