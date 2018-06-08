@@ -445,7 +445,7 @@ void set_args(header *t){
 		{.short_opt='w',.long_opt="patch_width",.key="patch_width:",.flag=ARG_DOUBLE,.off=offsetof(species,patch_width),.help="Patch width"},
 		{.short_opt='a',.long_opt="patch_angle",.key="patch_angle:",.flag=ARG_DOUBLE,.off=offsetof(species,patch_angle),.help="Patch angle"},
 		{.long_opt="angles",.key="angles:",.flag=ARG_LFVEC,.off=offsetof(species,angles),.n=offsetof(species,npatch),.help="Patch angles"},
-		{.long_opt="grand_canonical",.key="grand_canonical:",.flag=ARG_INT,.off=offsetof(species,grand_canonical),.help="Grand canonical -- enabled/disabled"},
+		{.short_opt='g',.long_opt="grand_canonical",.key="grand_canonical:",.flag=ARG_INT,.off=offsetof(species,grand_canonical),.help="Grand canonical -- enabled/disabled"},
 		{.short_opt='u',.long_opt="mu",.key="chemical_potential:",.flag=ARG_DOUBLE,.off=offsetof(species,mu),.help="Chemical potential"}
 	};
 	arg_set s={(sizeof(subargs)/sizeof(arg)),subargs},*tmp;

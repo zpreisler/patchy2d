@@ -133,12 +133,15 @@ int run(header *t,mySDL *s){
 				acc_rotate[mc_rotate(q,t,&energy)]++;
 			}
 			// Grand canonical moves
-			if(0.01<dsfmt_genrand_open_open(&dsfmt)){
+			if(0.01>dsfmt_genrand_open_open(&dsfmt)){
 				mc_gc(t,&energy);
 			}
-			acc_volume_xy[mc_npt_xy(t,&energy)]++;
-			acc_shape[mc_uy(t,&energy)]++;
-			acc_volume[mc_npt(t,&energy)]++;
+			if(0.001>dsfmt_genrand_open_open(&dsfmt)){
+				//acc_volume_xy[mc_npt_xy(t,&energy)]++;
+				//acc_shape[mc_uy(t,&energy)]++;
+				printf("volume\n");
+				acc_volume[mc_npt(t,&energy)]++;
+			}
 		}
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);
@@ -159,11 +162,16 @@ int run(header *t,mySDL *s){
 				print_nvt_log(stdout,t,i,difftime(t2,t1),energy,frac);
 			}
 			//Update screen
+			s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
+			s->scale=s->box[4]/(s->box[4]+1.0);
 			s->n=t->N;
 			m128d2float(t->p->q,s->positions,s->n);
+			float color[4]={0.5,1.0,0.5,1.0};
+			mySDLsetcolor(s->colors,color,s->n);
 			mySDLpositions(s,s->positions,s->n);
 			mySDLcolors(s,s->colors,s->n);
 			mySDLboundary(s,s->box);
+			mySDLresize(s);
 			mySDLdisplay(s);
 		}
 	}
