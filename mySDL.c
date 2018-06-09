@@ -10,25 +10,29 @@
 void mySDLresize(mySDL *s){
 	//Routines for window resizing
 	float a;
-	float m=s->scale;
+	float m=s->scale*0.1;
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	glViewport(0,0,s->w,s->h);
 	a=(float)s->h/(float)s->w;
 	if(a>1.0){
+		//m*=1.1;
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
-		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
+		s->view_matrix=(float[4]){1,0,0,1};
 	}
 	else{
+		m*=0.9;
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
-		s->view_matrix=(float[4]){s->box[0],s->box[1],s->box[4],s->box[5]};
+		s->view_matrix=(float[4]){1,0,0,1};
 	}
 	glUseProgram(s->program[0]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
 	glUniformMatrix2fv(s->view_matrix_loc,1,GL_FALSE,s->view_matrix);
+	glUniform1f(s->uy_loc,s->uy);
 
 	glUseProgram(s->program[1]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
 	glUniformMatrix2fv(s->view_matrix_loc,1,GL_FALSE,s->view_matrix);
+	glUniform1f(s->uy_loc,s->uy);
 }
 mySDL *mySDLinit(){
 	//Allocate
@@ -53,6 +57,7 @@ mySDL *mySDLinit(){
 	//Assign uniforms
 	s->proj_matrix_loc=glGetUniformLocation(s->program[0],"proj_matrix");
 	s->view_matrix_loc=glGetUniformLocation(s->program[0],"view_matrix");
+	s->uy_loc=glGetUniformLocation(s->program[0],"uy");
 	//Generate buffers
 	glGenVertexArrays(2,s->vao); //Generate vertex arrays
 	glGenBuffers(3,s->vbo); //Generate buffer objects

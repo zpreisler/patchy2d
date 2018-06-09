@@ -33,11 +33,12 @@ int main(int argc, char *argv[]){
 	s->positions=alloc(sizeof(float)*2*t->Nalloc);
 	s->colors=alloc(sizeof(float)*4*t->Nalloc);
 	s->n=t->N;
+	s->uy=t->uy;
 	m128d2float(t->p->q,s->positions,s->n);
 	mySDLsetcolor(s->colors,color,s->n);
 
 	s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-	s->scale=s->box[4]/(s->box[4]+1.0);
+	s->scale=1.0;
 
 	mySDLresize(s);
 	mySDLpositions(s,s->positions,s->n);

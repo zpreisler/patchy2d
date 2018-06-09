@@ -95,7 +95,7 @@ int mc_npt_xy(header *t,int *en){
 	int enn,eno,de;
 	double vol,vol_new;//,xnew;
 	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
-	double dx=t->max_vol*rnd;
+	double dx=t->max_xy*rnd;
 	double dv;
 	double acc;
 	double bp;
@@ -158,7 +158,7 @@ int mc_npt_dxdy(header *t,int *en){
 	int enn,eno,de;
 	double vol,vol_new;//,xnew;
 	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
-	double dx=t->max_vol*rnd;
+	double dx=t->max_dxdy*rnd;
 	double dv;
 	double acc;
 	double bp;
@@ -262,7 +262,7 @@ int mc_uy(header *t,int *en){
 	}
 	return 1;
 }
-void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[4]){
+/*void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[4]){
 	double vol=t->box[0]*t->box[1];
 	double rho=(double)t->N/vol;
 	fprintf(f,UGREEN"NPT\n"RESET
@@ -288,7 +288,7 @@ void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			energy,(double)energy/t->N,rho,t->uy,
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
-}
+}*/
 /*
 int npt(mpi_world *mpi __attribute__((unused)),header *t){
 	long long int i;

@@ -125,6 +125,8 @@ typedef struct header{
 	__m128d max_displacement;
 	double max_rotation;
 	double max_vol;
+	double max_xy;
+	double max_dxdy;
 	double max_uy;
 	double max_dsigma;
 	//Random seed

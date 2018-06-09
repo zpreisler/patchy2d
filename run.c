@@ -52,7 +52,7 @@ particle *rnd_specie(species *s){
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->N);
 	return (particle*)s->p+rnd;
 }
-void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
+/*void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
 	double vol=t->box[0]*t->box[1];
 	double rho=(double)t->N/vol;
 	fprintf(f,UGREEN"NVT\n"RESET
@@ -73,7 +73,35 @@ void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			energy,(double)energy/t->N,rho,
 			t->max_displacement[0],t->max_rotation,
 			frac[0],frac[1]);
+}*/
+void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[4]){
+	double vol=t->box[0]*t->box[1];
+	double rho=(double)t->N/vol;
+	fprintf(f,UGREEN"NPT\n"RESET
+			CYAN"step:"BLUE" %Ld "RESET
+			CYAN"time:"BLUE" %.0lfs "RESET
+			CYAN"mod:"BLUE" %d "RESET
+			CYAN"pmod:"BLUE" %d \n"RESET
+			YELLOW"energy:"RED" %d "RESET
+			YELLOW"U/N:"URED" %.3lf "RESET
+			YELLOW"rho:"UGREEN" %.3lf "RESET
+			YELLOW"uy:"UBLUE" %.3lf \n"RESET
+			UBLUE"parameters\n"RESET
+			BLACK"displacement:"GREEN" %.4lf "RESET
+			BLACK"rotation:"GREEN" %.4lf "RESET
+			BLACK"volume:"GREEN" %.4lf "RESET
+			BLACK"shape:"GREEN" %.4lf \n"RESET
+			UBLUE"acceptance\n"RESET
+			BLACK"displacement:"PURPLE" %.2lf "RESET
+			BLACK"rotation:"PURPLE" %.2lf "RESET
+			BLACK"volume:"PURPLE" %.2lf "RESET
+			BLACK"shape:"PURPLE" %.2lf \n"RESET,
+			i,time,t->mod,t->pmod,
+			energy,(double)energy/t->N,rho,t->uy,
+			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
+			frac[0],frac[1],frac[2],frac[3]);
 }
+
 int run(header *t,mySDL *s){
 	//Main routine -- Running the simulation
 	long long int i;
@@ -93,12 +121,13 @@ int run(header *t,mySDL *s){
 	int acc_rotate[2]={0,0};
 	int acc_volume[2]={0,0};
 	int acc_volume_xy[2]={0,0};
+	int acc_volume_dxdy[2]={0,0};
 	int acc_shape[2]={0,0};
 	t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 
-	int *acc[]={acc_move,acc_rotate,acc_volume,acc_volume_xy,acc_shape};
-	double *mmax[]={&(t->max_displacement[0]),&t->max_rotation,&t->max_vol,&t->max_uy};
-	double frac[5];
+	int *acc[]={acc_move,acc_rotate,acc_volume,acc_volume_xy,acc_volume_dxdy,acc_shape};
+	double *mmax[]={&(t->max_displacement[0]),&t->max_rotation,&t->max_vol,&t->max_xy,&t->max_dxdy,&t->max_uy};
+	double frac[6];
 
 	signal(SIGINT,signal_safe_exit_int);
 	signal(SIGUSR1,signal_safe_exit);
@@ -132,16 +161,17 @@ int run(header *t,mySDL *s){
 			else{
 				acc_rotate[mc_rotate(q,t,&energy)]++;
 			}
+		}
 			// Grand canonical moves
-			if(0.01>dsfmt_genrand_open_open(&dsfmt)){
-				mc_gc(t,&energy);
-			}
-			if(0.001>dsfmt_genrand_open_open(&dsfmt)){
-				//acc_volume_xy[mc_npt_xy(t,&energy)]++;
-				//acc_shape[mc_uy(t,&energy)]++;
-				printf("volume\n");
-				acc_volume[mc_npt(t,&energy)]++;
-			}
+		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+			mc_gc(t,&energy);
+		}
+		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+			//acc_volume_xy[mc_npt_xy(t,&energy)]++;
+			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
+			//acc_shape[mc_uy(t,&energy)]++;
+			printf("volume %lf\n",t->uy);
+			//acc_volume[mc_npt(t,&energy)]++;
 		}
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);
@@ -151,26 +181,27 @@ int run(header *t,mySDL *s){
 			uwrite(&rho,sizeof(double),1,frho);
 			vol=(t->box[0]*t->box[1]);
 			uwrite(&vol,sizeof(double),1,fvol);
-			gfrac(acc,frac,5);
+			gfrac(acc,frac,6);
 
 			if(t->optimize){
-				optimize(mmax,frac,4);
+				optimize(mmax,frac,6);
 				t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 			}
 
 			if(t->verbose){
-				print_nvt_log(stdout,t,i,difftime(t2,t1),energy,frac);
+				print_npt_log(stdout,t,i,difftime(t2,t1),energy,frac);
 			}
 			//Update screen
-			s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-			s->scale=s->box[4]/(s->box[4]+1.0);
+			//s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
+			//s->scale=s->box[4]/(s->box[4]+1.0);
 			s->n=t->N;
+			s->uy=t->uy;
 			m128d2float(t->p->q,s->positions,s->n);
 			float color[4]={0.5,1.0,0.5,1.0};
 			mySDLsetcolor(s->colors,color,s->n);
 			mySDLpositions(s,s->positions,s->n);
 			mySDLcolors(s,s->colors,s->n);
-			mySDLboundary(s,s->box);
+			//mySDLboundary(s,s->box);
 			mySDLresize(s);
 			mySDLdisplay(s);
 		}

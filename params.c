@@ -35,6 +35,8 @@ header *init_header(void){
 	t->max_displacement=_mm_set1_pd(1.0);
 	t->max_rotation=1.0;
 	t->max_vol=0.001;
+	t->max_xy=0.001;
+	t->max_dxdy=0.001;
 	t->max_uy=0.1;
 	t->max_dsigma=0.01;
 	//Wrinting and printing modulus

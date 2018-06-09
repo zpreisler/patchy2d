@@ -12,6 +12,8 @@ typedef struct mySDL{
 	float *view_matrix;
 	unsigned int proj_matrix_loc;
 	unsigned int view_matrix_loc;
+	unsigned int uy_loc;
+	float uy;
 	float *box;
 	float scale;
 	int w,h;
