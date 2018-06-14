@@ -47,9 +47,9 @@ void main(){
 	b=vec2(-1.0,0.0);
 	draw_sphere(p,c,a,b);
 
-	//b=vec2(0.0,-1.0);
-	//draw_sphere(p,c,a,b);
+	b=vec2(0.0,-1.0);
+	draw_sphere(p,c,a,b);
 
-	//b=vec2(-1.0,-1.0);
-	//draw_sphere(p,c,a,b);
+	b=vec2(-1.0,-1.0);
+	draw_sphere(p,c,a,b);
 }

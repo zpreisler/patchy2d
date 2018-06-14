@@ -9,7 +9,7 @@
 #include "mySDL.h"
 #include "init.h"
 #include "run.h"
-#define MAX_SOURCE_SIZE 8096
+//#define MAX_SOURCE_SIZE 8096
 dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
 	//Initialize header
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
 	mySDLsetcolor(s->colors,color,s->n);
 
 	s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-	s->scale=1.0;
+	s->scale=1.0/t->box[0];
 
 	mySDLresize(s);
 	mySDLpositions(s,s->positions,s->n);

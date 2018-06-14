@@ -194,6 +194,7 @@ int run(header *t,mySDL *s){
 			//Update screen
 			//s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
 			//s->scale=s->box[4]/(s->box[4]+1.0);
+			s->scale=1.0/t->box[0];
 			s->n=t->N;
 			s->uy=t->uy;
 			m128d2float(t->p->q,s->positions,s->n);

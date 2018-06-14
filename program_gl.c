@@ -3,7 +3,7 @@
 #include <utils.h>
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
-#define MAX_SOURCE_SIZE 8096
+#define MAX_SOURCE_SIZE 65536
 char *read_file(char *source){
 	char *source_str;
 	int source_size;
