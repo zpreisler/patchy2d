@@ -6,13 +6,10 @@ in vec2 uv;
 
 void main(){
 	float dist=dot(uv,uv);
-	if(dist<0.96){
-		out_color=vec4(1.0,0.0,0.0,0.1);
-	}
-	else if(dist<1.0){
+	if(dist<1.0){
 		out_color=vec4(geom_color.xyz,0.9);
 	}
 	else{
-		out_color=vec4(1.0,0.0,1.0,0.0);
+		out_color=vec4(1.0,1.0,1.0,0.0);
 	}
 }

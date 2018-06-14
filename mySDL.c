@@ -10,7 +10,7 @@
 void mySDLresize(mySDL *s){
 	//Routines for window resizing
 	float a;
-	float m=s->scale*0.1;
+	float m=s->scale/24.0;
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	glViewport(0,0,s->w,s->h);
 	a=(float)s->h/(float)s->w;
@@ -20,7 +20,6 @@ void mySDLresize(mySDL *s){
 		s->view_matrix=(float[4]){1,0,0,1};
 	}
 	else{
-		m*=0.9;
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
 		s->view_matrix=(float[4]){1,0,0,1};
 	}

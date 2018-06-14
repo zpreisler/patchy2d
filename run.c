@@ -170,7 +170,7 @@ int run(header *t,mySDL *s){
 			//acc_volume_xy[mc_npt_xy(t,&energy)]++;
 			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
 			//acc_shape[mc_uy(t,&energy)]++;
-			printf("volume %lf\n",t->uy);
+			//printf("volume %lf\n",t->uy);
 			//acc_volume[mc_npt(t,&energy)]++;
 		}
 		if(!(i%(t->mod*t->pmod))){
