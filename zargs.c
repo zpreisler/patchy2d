@@ -7,15 +7,18 @@
 #include "zargs.h"
 species *alloc_specie(void){
 	int i;
+	//pointer to the next specie in the list
 	species *s=(species*)alloc(sizeof(species));
+	s->compound=0; //set a simple particle
+	s->nppc=1; //set 1 particle per compound by default
 	s->flag=0;
 	s->sigma=1.0;
-	s->sigma_well=1.0;
+	s->sigma_well=1.0; //set an interaction length
 	strcpy(s->patch_type,"symmetric");
 	s->patch_width=10.0;
 	s->npatch=0; //no patches
 	s->grand_canonical=1; //enabled by default
-	s->mu=0.0;
+	s->mu=0.0; //set a chemcal potential
 	s->interaction_matrix=(double*)alloc(sizeof(double)*64);
 	s->angles=(double*)alloc(sizeof(double)*64);
 	for(i=0;i<64;i++)*(s->interaction_matrix+i)=1.0;
@@ -440,6 +443,7 @@ void set_args(header *t){
 		{.short_opt='d',.long_opt="sigma",.key="particle_diameter:",.flag=ARG_DOUBLE,.off=offsetof(species,sigma),.help="Particle diameter"},
 		{.short_opt='l',.long_opt="sigma_well",.key="interaction_length:",.flag=ARG_DOUBLE,.off=offsetof(species,sigma_well),.help="Interaction length"},
 		{.long_opt="npatch",.key="number_of_patches:",.flag=ARG_INT,.off=offsetof(species,npatch),.help="Number of patches"},
+		{.long_opt="nppc",.key="number_of_particles_per_compound:",.flag=ARG_INT,.off=offsetof(species,nppc),.help="Number of particles per compound"},
 		{.long_opt="interaction_matrix",.key="interaction_matrix:",.flag=ARG_LFVEC2,.off=offsetof(species,interaction_matrix),.n=offsetof(species,npatch),.help="Interaction matrix"},
 		{.long_opt="type",.key="patch_type:",.flag=ARG_STRING,.off=offsetof(species,patch_type),.help="Patch type"},
 		{.short_opt='w',.long_opt="patch_width",.key="patch_width:",.flag=ARG_DOUBLE,.off=offsetof(species,patch_width),.help="Patch width"},

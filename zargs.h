@@ -31,27 +31,31 @@ typedef struct patch{
 	__m128d *q_angle; //
 	__m128d *q;	
 }patch;
+//structure for a particle with patches
 typedef struct particle{
+	unsigned compound;// 0: simple particle; 1: particle is a part of a larger compound
 	//Energy
 	unsigned int en_new,en_old;	
-	unsigned nd;
+	unsigned nd; // number of bonds
 	__m128d *q; //position
 	__m128d *q_tmp; //old position
-	__m128d *q_track; //track
-	__m128d *q_well; //well
+	__m128d *q_track; //track -- for Einstein solid calculations
+	__m128d *q_well; //well -- for Einstein solid calculations
 	__m128d *or; //orientation
-	__m128d *or_well; //well orientation
+	__m128d *or_well; //well orientation -- for Einstein solid
 	__m128d *qp_rij; //q-p orientational vector
-	double qp_r2;
+	double qp_r2; //save q-p r^2 distance
+	//for compounds
+	__m128d *dq; //vector from the center of the compound
 	//Parameters
-	double sigma,sigma_well;
+	double sigma,sigma_well; //particle diameter and interaction range
 	//Patches
-	patch *patch;
-	int npatch;
-	double patch_width;
+	patch *patch; //pointer to array of patches
+	int npatch; // number of patches
+	double patch_width; // patch witdh (if patch width kept fixed)
 	//ID
 	unsigned n;
-	void *specie;
+	void *specie; //poiter to the beging of the array of the particles of the same specie
 	//HASH
 	unsigned h;
 	double *nd_d2;
@@ -62,11 +66,19 @@ typedef struct particle{
 	int flag;
 	int type;
 	//Graphs
-	int pass;
-	int idx;
-	int npcycles; //number of pcycles
-	void *pcycles; //pcycle
+	int pass; // tags visited particles
+	int idx; // particle index
+	int npcycles; //number of pcycles -- for cycle analysis
+	void *pcycles; //pcycle -- pointer to the list of cycles
 }particle;
+//structure for a compound particle
+typedef struct compound_particle{
+	unsigned int flag,n; //number of particles per compound;
+	__m128d *q; //compound position;
+	__m128d *or; //compound orientation;
+	particle *p; //pointer to particles belonging to the compound
+	void *specie; //pointer to the beging of the array of the compounds of the same specie
+}compound_particle;
 typedef struct hash_table{
 	particle *p;
 	particle ***list;
@@ -76,14 +88,17 @@ typedef struct update{
 	void *value;
 }update;
 typedef struct species{
+	unsigned int compound; //0: simple particle; 1: it is a particle compound
+	unsigned int nppc; //number of particles per compound
 	struct species *next;
-	unsigned int N,Nalloc; //number of particles
+	unsigned int N,Nalloc; //number of particles, number of allocated particles
 	int flag;
+	//particle specs (if the individual particles are not modified)
 	double sigma; //particle diameter
 	double sigma_well; //particle diameter plus patch range
-	int npatch;
+	int npatch; //number of patches
 	double patch_width; //patch width for kern-frenkel potentials
-	char patch_type[16];
+	char patch_type[256];
 	double patch_angle;
 	double *angles;
 	int grand_canonical; //grand canonical switch
@@ -93,8 +108,9 @@ typedef struct species{
 }species;
 typedef struct header{
 	char name[NAME_LENGTH];
-	unsigned int N,Nalloc;
-	unsigned int npatch,npatch_alloc;
+	unsigned int ncompound,ncompound_alloc; //number of compounds, number to compounds allocated
+	unsigned int N,Nalloc;// number of particles, number of particles allocated
+	unsigned int npatch,npatch_alloc;//number of patches, number of patches allocated
 	long long int step;
 	species *specie;
 	species *update;

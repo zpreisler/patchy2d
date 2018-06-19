@@ -7,10 +7,13 @@
 #include "graph.h"
 void count_particles(header *t){
 	species *s=t->specie;	
-	t->N=0;
-	t->Nalloc=0;
-	t->npatch=0;
-	t->npatch_alloc=0;
+	t->ncompound=0;
+	t->ncompound_alloc=0;
+	t->N=0; //number of particles
+	t->Nalloc=0; //number of particles allocated -- sets upper bound for grand canonical
+	t->npatch=0; //number of patches
+	t->npatch_alloc=0; //number of patches allocated
+	//count over all specie
 	while(s){
 		s->Nalloc=MAX(s->N*M_ALLOC*t->copy[0]*t->copy[1],MIN_ALLOC);
 		t->N+=s->N*t->copy[0]*t->copy[1];
@@ -82,6 +85,7 @@ particle *alloc_particles(header *t){
 	particle *q;
 	species *s=t->specie;
 	count_particles(t);
+	//Allocate memory for compounds particles and patches
 	t->p=(particle*)alloc(sizeof(particle)*t->Nalloc);
 	t->s=(patch*)alloc(sizeof(patch)*t->npatch_alloc);
 	particle_memory *pmem=alloc_pmem(t->Nalloc);
