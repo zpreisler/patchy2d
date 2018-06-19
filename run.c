@@ -21,7 +21,7 @@
 #include "canonical.h"
 #include "grand_canonical.h"
 #include "npt.h"
-
+//Graphics
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
@@ -41,42 +41,20 @@ void signal_safe_exit_int(int sig){
 }
 particle *rnd_particle(header *t){
 	species *s=t->specie;
-	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*t->N);
-	while(s&&s->N<(rnd+1)){
-		rnd-=s->N;
+	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*t->nparticle);
+	while(s&&s->nparticle<(rnd+1)){
+		rnd-=s->nparticle;
 		s=s->next;
 	}
 	return (particle*)s->p+rnd;
 }
 particle *rnd_specie(species *s){
-	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->N);
+	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->nparticle);
 	return (particle*)s->p+rnd;
 }
-/*void print_nvt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[2]){
-	double vol=t->box[0]*t->box[1];
-	double rho=(double)t->N/vol;
-	fprintf(f,UGREEN"NVT\n"RESET
-			CYAN"step:"BLUE" %Ld "RESET
-			CYAN"time:"BLUE" %.0lfs "RESET
-			CYAN"mod:"BLUE" %d "RESET
-			CYAN"pmod:"BLUE" %d \n"RESET
-			YELLOW"energy:"RED" %d "RESET
-			YELLOW"U/N:"URED" %.3lf "RESET
-			YELLOW"rho:"GREEN" %.3lf \n"RESET
-			UBLUE"parameters\n"RESET
-			BLACK"displacement:"GREEN" %.4lf "RESET
-			BLACK"rotation:"GREEN" %.4lf \n"RESET
-			UBLUE"acceptance\n"RESET
-			BLACK"displacement:"PURPLE" %.2lf "RESET
-			BLACK"rotation:"PURPLE" %.2lf \n"RESET,
-			i,time,t->mod,t->pmod,
-			energy,(double)energy/t->N,rho,
-			t->max_displacement[0],t->max_rotation,
-			frac[0],frac[1]);
-}*/
 void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[4]){
 	double vol=t->box[0]*t->box[1];
-	double rho=(double)t->N/vol;
+	double rho=(double)t->nparticle/vol;
 	fprintf(f,UGREEN"NPT\n"RESET
 			CYAN"step:"BLUE" %Ld "RESET
 			CYAN"time:"BLUE" %.0lfs "RESET
@@ -97,7 +75,7 @@ void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			BLACK"volume:"PURPLE" %.2lf "RESET
 			BLACK"shape:"PURPLE" %.2lf \n"RESET,
 			i,time,t->mod,t->pmod,
-			energy,(double)energy/t->N,rho,t->uy,
+			energy,(double)energy/t->nparticle,rho,t->uy,
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
 }
@@ -152,7 +130,7 @@ int run(header *t,mySDL *s){
 				break;
 		}
 		//Monte Carlo cycle
-		for(ncycle=0;ncycle<2*t->N;ncycle++){
+		for(ncycle=0;ncycle<2*t->nparticle;ncycle++){
 			//Translation and Rotation
 			q=rnd_particle(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
@@ -175,9 +153,9 @@ int run(header *t,mySDL *s){
 		}
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);
-			en=(double)energy/(double)t->N;
+			en=(double)energy/(double)t->nparticle;
 			uwrite(&en,sizeof(double),1,fen);
-			rho=(double)t->N/(t->box[0]*t->box[1]);
+			rho=(double)t->nparticle/(t->box[0]*t->box[1]);
 			uwrite(&rho,sizeof(double),1,frho);
 			vol=(t->box[0]*t->box[1]);
 			uwrite(&vol,sizeof(double),1,fvol);
@@ -195,7 +173,7 @@ int run(header *t,mySDL *s){
 			//s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
 			//s->scale=s->box[4]/(s->box[4]+1.0);
 			s->scale=1.0/t->box[0];
-			s->n=t->N;
+			s->n=t->nparticle;
 			s->uy=t->uy;
 			m128d2float(t->p->q,s->positions,s->n);
 			float color[4]={0.5,1.0,0.5,1.0};

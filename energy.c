@@ -152,14 +152,14 @@ int all_particle_energy_hash(header *t,int *en){
 	*en=0;
 	while(s){
 		p=s->p;
-		for(i=0;i<s->N;i++){
+		for(i=0;i<s->nparticle;i++){
 			(p+i)->en_new=0;
 		}
 		s=s->next;
 	}
 	s=t->specie;
 	while(s){
-		for(i=0;i<s->N;i++){
+		for(i=0;i<s->nparticle;i++){
 			p=(particle*)s->p+i;
 			h=hash(*p->q,t->h1);
 			for(k=0;k<t->ndir;k++){

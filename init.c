@@ -20,7 +20,7 @@ int init_configuration_random(header *t){
 	particle *q;
 	species *s=t->specie;
 	while(s){
-		for(i=0;i<s->N;i++){
+		for(i=0;i<s->nparticle;i++){
 			k=0;
 			q=(particle*)(s->p+i);
 			a=2.0*M_PI*dsfmt_genrand_open_open(&dsfmt);
@@ -35,7 +35,7 @@ int init_configuration_random(header *t){
 			set_patches(q);
 			hash_insert(q,t->h1,t->table);
 		}
-		printf(GREEN"-->"CYAN">"BLUE">"RESET" Initialized %d particles with diameter %.3lf"RESET"\n",s->N,s->sigma);
+		printf(GREEN"-->"CYAN">"BLUE">"RESET" Initialized %d particles with diameter %.3lf"RESET"\n",s->nparticle,s->sigma);
 		s=s->next;
 	}
 	return 0;
@@ -73,7 +73,7 @@ int save_configuration(char *file,header *t){
 	rev_list(&t->specie);
 	s=t->specie;
 	while(s){
-		for(i=0;i<s->N;i++){
+		for(i=0;i<s->nparticle;i++){
 			p=s->p+i;
 			fprintf(fconf,"%.12lf %.12lf %.12lf %.12lf\n",(*(p)->q)[0],(*(p)->q)[1],(*(p)->or)[0],(*(p)->or)[1]);
 		}

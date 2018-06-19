@@ -30,9 +30,9 @@ int main(int argc, char *argv[]){
 	float color[4]={0.5,1.0,0.5,1.0};
 	mySDL *s=mySDLinit();
 
-	s->positions=alloc(sizeof(float)*2*t->Nalloc);
-	s->colors=alloc(sizeof(float)*4*t->Nalloc);
-	s->n=t->N;
+	s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
+	s->colors=alloc(sizeof(float)*4*t->nparticle_alloc);
+	s->n=t->nparticle;
 	s->uy=t->uy;
 	m128d2float(t->p->q,s->positions,s->n);
 	mySDLsetcolor(s->colors,color,s->n);

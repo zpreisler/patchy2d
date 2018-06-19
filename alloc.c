@@ -6,21 +6,44 @@
 #include "alloc.h"
 #include "graph.h"
 void count_particles(header *t){
+	unsigned int cbox;
 	species *s=t->specie;	
+	//t->N=0; //number of particles
+	//t->Nalloc=0; //number of particles allocated -- sets upper bound for grand canonical
 	t->ncompound=0;
 	t->ncompound_alloc=0;
-	t->N=0; //number of particles
-	t->Nalloc=0; //number of particles allocated -- sets upper bound for grand canonical
-	t->npatch=0; //number of patches
-	t->npatch_alloc=0; //number of patches allocated
-	//count over all specie
+	t->nparticle=0;
+	t->nparticle_alloc=0;
+	t->npatches=0; //number of patches
+	t->npatches_alloc=0; //number of patches allocated
+	//copy box multiplier
+	cbox=t->copy[0]*t->copy[1];
+	//count over all specie (species are ordered in linked list)
 	while(s){
-		s->Nalloc=MAX(s->N*M_ALLOC*t->copy[0]*t->copy[1],MIN_ALLOC);
-		t->N+=s->N*t->copy[0]*t->copy[1];
-		t->Nalloc+=s->Nalloc;
-		t->npatch+=s->N*s->npatch;
-		t->npatch_alloc+=s->Nalloc*s->npatch;
+		s->ncompound=s->N*cbox; //s->N is number of compounds
+		s->nparticle=s->ncompound*s->nppc; //number of particles is number of compounds x number of particles per compound
+		s->npatches=s->nparticle*s->npatch; //number of particle x number of patches per particle
+		//alloc
+		s->ncompound_alloc=max(s->ncompound*M_ALLOC,MIN_ALLOC);
+		s->nparticle_alloc=s->ncompound_alloc*s->nppc;
+		s->npatches_alloc=s->nparticle_alloc*s->npatch;
+		//count
+		t->ncompound+=s->ncompound;
+		t->nparticle+=s->nparticle;
+		t->npatches+=s->npatches;
+		//count alloc
+		t->ncompound_alloc+=s->ncompound_alloc;
+		t->nparticle_alloc+=s->nparticle_alloc;
+		t->npatches_alloc+=s->npatches_alloc;
+		//move on	
 		s=s->next;
+		//s->Nalloc=max(s->N*M_ALLOC*cbox,MIN_ALLOC);
+		//header
+		//t->ncompound=s->N*t->copy[0]*t->copy[1];
+		//t->N+=s->N*t->copy[0]*t->copy[1];
+		//t->Nalloc+=s->Nalloc;
+		//t->npatch+=s->N*s->npatch;
+		//t->npatch_alloc+=s->Nalloc*s->npatch;
 	}
 }
 particle_memory *alloc_pmem(unsigned size){
@@ -86,28 +109,28 @@ particle *alloc_particles(header *t){
 	species *s=t->specie;
 	count_particles(t);
 	//Allocate memory for compounds particles and patches
-	t->p=(particle*)alloc(sizeof(particle)*t->Nalloc);
-	t->s=(patch*)alloc(sizeof(patch)*t->npatch_alloc);
-	particle_memory *pmem=alloc_pmem(t->Nalloc);
-	patch_memory *smem=alloc_smem(t->npatch_alloc);
-	for(i=0;i<t->Nalloc;i++){
+	t->p=(particle*)alloc(sizeof(particle)*t->nparticle_alloc);
+	t->s=(patch*)alloc(sizeof(patch)*t->npatches_alloc);
+	particle_memory *pmem=alloc_pmem(t->nparticle_alloc);
+	patch_memory *smem=alloc_smem(t->npatches_alloc);
+	for(i=0;i<t->nparticle_alloc;i++){
 		map_pmem(t->p+i,pmem,i);
 	}
-	for(i=0;i<t->npatch_alloc;i++){
+	for(i=0;i<t->npatches_alloc;i++){
 		map_smem(t->s+i,smem,i);
 	}
 	j=0;
 	while(s){
 		s->flag=j++;
 		s->p=t->p+k;
-		k+=s->Nalloc;
-		for(i=0;i<s->Nalloc;i++){
+		k+=s->nparticle_alloc;
+		for(i=0;i<s->nparticle_alloc;i++){
 			q=s->p+i;
 			assign_particle(q,s);
 			q->patch=t->s+l;
 			l+=s->npatch;
 			q->type=type;
-			for(j=0;j<s->npatch;j++){
+			for(j=0;j<s->npatch;j++){ //for each particle assing patches
 				assign_patch(q->patch+j,l+j);
 			}
 		}

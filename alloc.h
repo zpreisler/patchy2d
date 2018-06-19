@@ -3,7 +3,7 @@
 #define NLIST 24 
 #define MIN_ALLOC 2048
 #define M_ALLOC 2
-#define MAX(a,b) ((a)>(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
 typedef struct patch_memory{
 	double *angle;
 	__m128d *q_angle;
@@ -18,5 +18,9 @@ typedef struct particle_memory{
 	__m128d *or;
 	__m128d *or_well;
 }particle_memory;
+typedef struct compound_memory{
+	__m128d *q; //compound position;
+	__m128d *or; //compound orientation;
+}compound_memory;
 extern particle *alloc_particles(header *t);
 #endif

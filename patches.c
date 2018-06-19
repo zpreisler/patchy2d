@@ -16,7 +16,7 @@ void init_patches(header *t){
 	while(s){
 		if(!strcmp(s->patch_type,"symmetric")){
 			w=2.0*M_PI/s->npatch;
-			for(i=0;i<s->Nalloc;i++){
+			for(i=0;i<s->nparticle_alloc;i++){
 				q=s->p+i;
 				for(j=0;j<q->npatch;j++){
 					p=q->patch+j;				
@@ -28,7 +28,7 @@ void init_patches(header *t){
 		else if(!strcmp(s->patch_type,"asymmetric")){
 			//w=(2.0*M_PI*(360.0-s->patch_angles[0])/360.0)/(s->npatch-1);
 			w=(2.0*M_PI*(360.0-s->patch_angle)/360.0)/(s->npatch-1);
-			for(i=0;i<s->Nalloc;i++){
+			for(i=0;i<s->nparticle_alloc;i++){
 				q=s->p+i;
 				for(j=0;j<q->npatch;j++){
 					p=q->patch+j;				
@@ -54,7 +54,7 @@ void init_patches(header *t){
 				}
 			}
 			else w=2.0*M_PI/s->npatch;
-			for(i=0;i<s->Nalloc;i++){
+			for(i=0;i<s->nparticle_alloc;i++){
 				q=s->p+i;
 				for(j=0;j<q->npatch;j++){
 					p=q->patch+j;				

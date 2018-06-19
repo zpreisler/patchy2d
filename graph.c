@@ -852,7 +852,7 @@ int find_all_cycles(header *t){
 	particle *p;
 	species *s=t->specie;
 	while(s){
-		for(i=0;i<s->Nalloc;i++){
+		for(i=0;i<s->particle_alloc;i++){
 			p=(particle*)s->p+i;
 			p->npcycles=0;
 		}
@@ -860,7 +860,7 @@ int find_all_cycles(header *t){
 	}
 	s=t->specie;
 	while(s){
-		for(i=0;i<s->N;i++){
+		for(i=0;i<s->nparticle;i++){
 			p=(particle*)s->p+i;
 			if(p->npcycles<p->npatch){ // to avoid covered particles already
 				t->ncycles+=find_cycles(p,t->matrix_list,t->graph_pcycle,t->adj_matrix,t->ncycles);
@@ -875,8 +875,8 @@ int find_all_cycles(header *t){
 }
 void alloc_graph(header *t){
 	t->ncycles=0;
-	t->matrix_list=(particle**)alloc(sizeof(particle*)*t->Nalloc);
+	t->matrix_list=(particle**)alloc(sizeof(particle*)*t->nparticle_alloc);
 	t->adj_matrix=init_matrix(MATRIX_ALLOC);
-	t->graph_pcycle=alloc_pcycle(t->Nalloc,PATH_SIZE);
+	t->graph_pcycle=alloc_pcycle(t->nparticle_alloc,PATH_SIZE);
 	alloc_edges(t->adj_matrix,t->npatch_alloc);
 }

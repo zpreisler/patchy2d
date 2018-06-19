@@ -79,6 +79,7 @@ typedef struct compound_particle{
 	particle *p; //pointer to particles belonging to the compound
 	void *specie; //pointer to the beging of the array of the compounds of the same specie
 }compound_particle;
+//hash table structure
 typedef struct hash_table{
 	particle *p;
 	particle ***list;
@@ -90,17 +91,24 @@ typedef struct update{
 typedef struct species{
 	unsigned int compound; //0: simple particle; 1: it is a particle compound
 	unsigned int nppc; //number of particles per compound
+	unsigned int ncompound,ncompound_alloc; //number of compounds
+	unsigned int nparticle,nparticle_alloc; //number of particles
+	unsigned int npatches,npatches_alloc; //number of all patches
+	//N -- read from input line or command line
+	unsigned int N;//,Nalloc; //number of particles, number of allocated particles
 	struct species *next;
-	unsigned int N,Nalloc; //number of particles, number of allocated particles
 	int flag;
+	//
 	//particle specs (if the individual particles are not modified)
 	double sigma; //particle diameter
 	double sigma_well; //particle diameter plus patch range
-	int npatch; //number of patches
+	int npatch; //number of patches per particle
 	double patch_width; //patch width for kern-frenkel potentials
 	char patch_type[256];
 	double patch_angle;
 	double *angles;
+	//
+	//Simulation settings for the specie
 	int grand_canonical; //grand canonical switch
 	double mu; //chemical potential 
 	double *interaction_matrix;
@@ -108,9 +116,10 @@ typedef struct species{
 }species;
 typedef struct header{
 	char name[NAME_LENGTH];
+	//unsigned int N,Nalloc;// number of particles, number of particles allocated
 	unsigned int ncompound,ncompound_alloc; //number of compounds, number to compounds allocated
-	unsigned int N,Nalloc;// number of particles, number of particles allocated
-	unsigned int npatch,npatch_alloc;//number of patches, number of patches allocated
+	unsigned int nparticle,nparticle_alloc; //number of particles, number of particles allocated
+	unsigned int npatches,npatches_alloc;//number of all patches, number of patches allocated
 	long long int step;
 	species *specie;
 	species *update;
