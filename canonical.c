@@ -20,39 +20,46 @@
 #include "optimize.h"
 #include "canonical.h"
 extern dsfmt_t dsfmt;
-int mc_move(particle *p,header *t,int *en){
+//int mc_move(particle *p,header *t,int *en){
+int mc_move(compound_particle *c,header *t,int *en){
 	int eno=0,enn=0;
 	int de;
 	double rmd;
-	__m128d q0=*(p->q);
+	__m128d q0=*(c->q);
 	__m128d rnd=(__m128d){dsfmt_genrand_open_open(&dsfmt)-0.5,dsfmt_genrand_open_open(&dsfmt)-0.5};
 	__m128d dq=t->max_displacement*rnd;
 	dq[0]-=dq[1]*t->uy;
-	*(p->q)+=dq;
-	boundary(p->q,t->box);
-	hash_reinsert(p,t->h1,t->table);
-	eno=p->en_new;
-	list_swap(p);
-	if(overlap(p,t)){
-		*(p->q)=q0;
-		hash_reinsert(p,t->h1,t->table);
-		list_swap(p);
+	*(c->q)+=dq;
+	reset_particle(c,t);
+	//boundary(p->q,t->box);
+	//hash_reinsert(p,t->h1,t->table);
+	//eno=p->en_new;
+	//list_swap(p);
+	//if(overlap(p,t)){
+	if(compound_overlap(c,t)){
+		*(c->q)=q0;
+		reset_particle(c,t);
+		//hash_reinsert(p,t->h1,t->table);
+		//list_swap(p);
 		return 1;
 	}
+	return 0;
+	/*
 	enn=particle_energy_hash2(p);
 	de=enn-eno;
 	rmd=dsfmt_genrand_open_open(&dsfmt);
 	if(rmd<exp(t->epsilon*de)){
-		adjust_lists(p);
+		//adjust_lists(p);
 		*en+=de;
 		return 0;
 	}
 	else{
-		*(p->q)=q0;
-		hash_reinsert(p,t->h1,t->table);
-		list_swap(p);
+		*(c->q)=q0;
+		reset_particle(c,t);
+		//hash_reinsert(p,t->h1,t->table);
+		//list_swap(p);
 		return 1;
-	}
+	}*/
 }
 int mc_rotate(particle *p,header *t,int *en){
 	int eno=0,enn=0;

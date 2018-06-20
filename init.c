@@ -33,6 +33,18 @@ void set_particle(compound_particle *c,header *t){
 		hash_insert(p,t->h1,t->table);
 	}
 }
+void reset_particle(compound_particle *c,header *t){
+	int i;
+	particle *p;
+	for(i=0;i<c->nparticle;i++){
+		p=c->p+i;
+		*(p)->q=*(c)->q+*(c)->or*i*0.5;
+		*(p)->or=*(c)->or;
+		boundary(p->q,t->box);
+		set_patches(p);
+		hash_reinsert(p,t->h1,t->table);
+	}
+}
 int init_configuration_random(header *t){
 	unsigned i,k;
 	double a;

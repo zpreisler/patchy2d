@@ -16,16 +16,18 @@ int overlap(particle *p,header *t){
 	p->nd=0;
 	for(k=0;k<t->ndir;k++){
 		for(q=*(t->table)[h].list[k];q;q=q->next){
-			if(q!=p){
-				rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
-				r2=length2(rij);
-				d2=SQR((p->sigma+q->sigma)*0.5);
-				if(r2<d2){
-					return 1;
+			if(q->c!=p->c){
+				if(q!=p){
+					rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
+					r2=length2(rij);
+					d2=SQR((p->sigma+q->sigma)*0.5);
+					if(r2<d2){
+						return 1;
+					}
+					p->nd_list[p->nd++]=q;
+					*q->qp_rij=rij;
+					q->qp_r2=r2;
 				}
-				p->nd_list[p->nd++]=q;
-				*q->qp_rij=rij;
-				q->qp_r2=r2;
 			}
 		}
 	}

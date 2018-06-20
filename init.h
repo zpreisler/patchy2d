@@ -13,4 +13,5 @@ extern void print_input_configurational_files(FILE *f,input_files *input);
 extern int load_configuration_file(FILE *f,header *t);
 extern int init_configuration_random(header *t);
 extern int read_input(int argc,char *argv[],input_files *input,header *t);
+extern void reset_particle(compound_particle *c,header *t);
 #endif

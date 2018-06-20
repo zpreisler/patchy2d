@@ -48,6 +48,15 @@ particle *rnd_particle(header *t){
 	}
 	return (particle*)s->p+rnd;
 }
+compound_particle *rnd_compound(header *t){
+	species *s=t->specie;
+	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*t->ncompound);
+	while(s&&s->ncompound<(rnd+1)){
+		rnd-=s->ncompound;
+		s=s->next;
+	}
+	return (compound_particle*)s->c+rnd;
+}
 particle *rnd_specie(species *s){
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->nparticle);
 	return (particle*)s->p+rnd;
@@ -85,6 +94,7 @@ int run(header *t,mySDL *s){
 	long long int i;
 	unsigned int ncycle;
 	particle *q;
+	compound_particle *c;
 	int energy=0;
 
 	FILE *fen=open_file2(t->name,".en","w");
@@ -133,16 +143,17 @@ int run(header *t,mySDL *s){
 		for(ncycle=0;ncycle<2*t->nparticle;ncycle++){
 			//Translation and Rotation
 			q=rnd_particle(t);
-			if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
-				acc_move[mc_move(q,t,&energy)]++;	
-			}
-			else{
-				acc_rotate[mc_rotate(q,t,&energy)]++;
-			}
+			c=rnd_compound(t);
+			//if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
+				acc_move[mc_move(c,t,&energy)]++;	
+			//}
+			//else{
+				//acc_rotate[mc_rotate(q,t,&energy)]++;
+			//}
 		}
 			// Grand canonical moves
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-			mc_gc(t,&energy);
+			//mc_gc(t,&energy);
 		}
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
 			//acc_volume_xy[mc_npt_xy(t,&energy)]++;
@@ -176,7 +187,7 @@ int run(header *t,mySDL *s){
 			s->n=t->nparticle;
 			s->uy=t->uy;
 			m128d2float(t->p->q,s->positions,s->n);
-			float color[4]={0.5,1.0,0.5,1.0};
+			float color[4]={1.0,0.0,0.0,1.0};
 			mySDLsetcolor(s->colors,color,s->n);
 			mySDLpositions(s,s->positions,s->n);
 			mySDLcolors(s,s->colors,s->n);
