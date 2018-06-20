@@ -26,6 +26,11 @@ typedef struct arg_set{
 	arg *args;
 }arg_set;
 typedef struct patch{
+	//linking
+	void *p;
+	void *c;
+	void *specie;
+	//
 	int id;
 	double *angle; //angle with respect to particle orientation
 	__m128d *q_angle; //
@@ -33,7 +38,9 @@ typedef struct patch{
 }patch;
 //structure for a particle with patches
 typedef struct particle{
-	unsigned compound;// 0: simple particle; 1: particle is a part of a larger compound
+	patch *patch; //pointer to array of patches
+	void *c; //pointer to the compound
+	void *specie; //poiter to the beging of the array of the particles of the same specie
 	//Energy
 	unsigned int en_new,en_old;	
 	unsigned nd; // number of bonds
@@ -50,12 +57,10 @@ typedef struct particle{
 	//Parameters
 	double sigma,sigma_well; //particle diameter and interaction range
 	//Patches
-	patch *patch; //pointer to array of patches
 	int npatch; // number of patches
 	double patch_width; // patch witdh (if patch width kept fixed)
 	//ID
-	unsigned n;
-	void *specie; //poiter to the beging of the array of the particles of the same specie
+	unsigned n; //ID
 	//HASH
 	unsigned h;
 	double *nd_d2;
@@ -68,16 +73,20 @@ typedef struct particle{
 	//Graphs
 	int pass; // tags visited particles
 	int idx; // particle index
+	int id; //id
 	int npcycles; //number of pcycles -- for cycle analysis
 	void *pcycles; //pcycle -- pointer to the list of cycles
 }particle;
 //structure for a compound particle
 typedef struct compound_particle{
-	unsigned int flag,n; //number of particles per compound;
-	__m128d *q; //compound position;
-	__m128d *or; //compound orientation;
+	patch *s; //pointer to patches belonging to the compound
 	particle *p; //pointer to particles belonging to the compound
 	void *specie; //pointer to the beging of the array of the compounds of the same specie
+	int id;
+	int nparticle;
+	unsigned int flag,n; //flag, ID;
+	__m128d *q; //compound position;
+	__m128d *or; //compound orientation;
 }compound_particle;
 //hash table structure
 typedef struct hash_table{
@@ -89,6 +98,11 @@ typedef struct update{
 	void *value;
 }update;
 typedef struct species{
+	//linking
+	patch *s; //pointer to patch array
+	particle *p; //pointer to particle array
+	compound_particle *c; //pointer to compound particle array
+	//
 	unsigned int compound; //0: simple particle; 1: it is a particle compound
 	unsigned int nppc; //number of particles per compound
 	unsigned int ncompound,ncompound_alloc; //number of compounds
@@ -112,7 +126,6 @@ typedef struct species{
 	int grand_canonical; //grand canonical switch
 	double mu; //chemical potential 
 	double *interaction_matrix;
-	particle *p; //pointer to particle list
 }species;
 typedef struct header{
 	char name[NAME_LENGTH];
@@ -123,6 +136,7 @@ typedef struct header{
 	long long int step;
 	species *specie;
 	species *update;
+	compound_particle *c;
 	particle *p;
 	patch *s;
 	int nspecies;

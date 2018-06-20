@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 	dump_args(stdout,t->argz);
 
 	//Graphics
-	float color[4]={0.5,1.0,0.5,1.0};
+	float color[4]={1.0,0.0,0.0,0.05};
 	mySDL *s=mySDLinit();
 
 	s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
@@ -48,9 +48,22 @@ int main(int argc, char *argv[]){
 
 	run(t,s);
 
+	int quit=0;
+	while(!quit){
+		SDL_PollEvent(&s->event);
+		switch(s->event.type){
+			case SDL_QUIT:
+				quit=1;
+				break;
+			case SDL_WINDOWEVENT:
+				if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
+					mySDLresize(s);
+					mySDLdisplay(s);
+				}
+				break;
+		}
+	}
 	SDL_Quit();
-
 	save_configuration(t->name,t);
-
 	return 0;
 }

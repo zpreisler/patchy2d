@@ -31,6 +31,15 @@ int overlap(particle *p,header *t){
 	}
 	return 0;
 }
+int compound_overlap(compound_particle *c,header *t){
+	int i;
+	particle *p;
+	for(i=0;i<c->nparticle;i++){
+		p=c->p+i;
+		if(overlap(p,t))return 1;
+	}
+	return 0;
+}
 int specific_interaction(int i,int j,int n,double *m){
 	if(*(m+i+n*j)!=0.0)return 1;
 	return 0;

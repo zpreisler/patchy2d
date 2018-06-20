@@ -14,6 +14,52 @@
 #include "patches.h"
 #include "alloc.h"
 extern dsfmt_t dsfmt;
+void pre_set_particle(compound_particle *c,header *t){
+	int i;
+	particle *p;
+	for(i=0;i<c->nparticle;i++){
+		p=c->p+i;
+		*(p)->q=*(c)->q+*(c)->or*i*0.5;
+		*(p)->or=*(c)->or;
+		boundary(p->q,t->box);
+	}
+}
+void set_particle(compound_particle *c,header *t){
+	int i;
+	particle *p;
+	for(i=0;i<c->nparticle;i++){
+		p=c->p+i;
+		set_patches(p);
+		hash_insert(p,t->h1,t->table);
+	}
+}
+int init_configuration_random(header *t){
+	unsigned i,k;
+	double a;
+	compound_particle *c;
+	species *s=t->specie;
+	while(s){
+		for(i=0;i<s->ncompound;i++){
+			k=0;
+			c=(compound_particle*)(s->c+i);
+			a=2.0*M_PI*dsfmt_genrand_open_open(&dsfmt);
+			do{
+				*(c)->q=t->box*rnd11();
+				*(c)->or=sincosa(a);
+				pre_set_particle(c,t);
+				k++;
+				if(k>4096){
+					return 1;
+				}
+			}while(compound_overlap(c,t));
+			set_particle(c,t);
+		}
+		printf(GREEN"-->"CYAN">"BLUE">"RESET" Initialized %d particles with diameter %.3lf"RESET"\n",s->nparticle,s->sigma);
+		s=s->next;
+	}
+	return 0;
+}
+/*
 int init_configuration_random(header *t){
 	unsigned i,k;
 	double a;
@@ -40,7 +86,7 @@ int init_configuration_random(header *t){
 	}
 	return 0;
 }
-
+*/
 void rev_list(species **head){
 	species *prev=NULL;
 	species *current=*head;
