@@ -186,7 +186,7 @@ int run(header *t,mySDL *s){
 			s->n=t->nparticle;
 			s->uy=t->uy;
 			m128d2float(t->p->q,s->positions,s->n);
-			float color[4]={1.0,0.0,0.0,1.0};
+			float color[4]={1.0,0.0,0.0,0.333};
 			mySDLsetcolor(s->colors,color,s->n);
 			mySDLpositions(s,s->positions,s->n);
 			mySDLcolors(s,s->colors,s->n);

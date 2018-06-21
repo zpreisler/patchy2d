@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 	dump_args(stdout,t->argz);
 
 	//Graphics
-	float color[4]={1.0,0.0,0.0,0.05};
+	float color[4]={1.0,0.0,0.0,0.333};
 	mySDL *s=mySDLinit();
 
 	s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);

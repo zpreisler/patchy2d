@@ -40,12 +40,17 @@ mySDL *mySDLinit(){
 	s->view_matrix=alloc(sizeof(float)*4);
 	s->box=alloc(sizeof(float)*8);
 	//Generate program
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,2);
+	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL,1);
 	SDL_Init(SDL_INIT_VIDEO);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,2);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,8);
 	//Define window
 	s->window=SDL_CreateWindow("SDL",
 			SDL_WINDOWPOS_UNDEFINED,
 			//SDL_WINDOWPOS_UNDEFINED,640,480,
-			SDL_WINDOWPOS_UNDEFINED,240,240,
+			SDL_WINDOWPOS_UNDEFINED,480,480,
 			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 	s->glcontext=SDL_GL_CreateContext(s->window);
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
@@ -62,8 +67,11 @@ mySDL *mySDLinit(){
 	glGenVertexArrays(2,s->vao); //Generate vertex arrays
 	glGenBuffers(3,s->vbo); //Generate buffer objects
 	//Enable transparency
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	//Multisample
+	glEnable(GL_MULTISAMPLE);
 	//Print graphics card info
 	glsl_info();
 	return s;
@@ -96,13 +104,20 @@ void mySDLboundary(mySDL *s,float *b){
 	glEnableVertexAttribArray(0);
 }
 void mySDLdisplay(mySDL *s){
+	//Enable transparency
+	//glEnable(GL_BLEND);
+	//glDisable(GL_DEPTH_TEST);
+	//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	//
+	//glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	//glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+	//glDisable(GL_LINE_SMOOTH);
+	//glDisable(GL_POLYGON_SMOOTH);
+	//glEnable(GL_MULTISAMPLE);
 	//Draw particles and the boundary
 	//Clear
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	//Draw
 	glUseProgram(s->program[0]);
 	glBindVertexArray(s->vao[0]);
