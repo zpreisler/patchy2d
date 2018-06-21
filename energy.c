@@ -34,7 +34,6 @@ int overlap(particle *p,header *t){
 			}
 		}
 	}
-	//printf("overlap p->nd %d\n",p->nd);
 	return 0;
 }
 int compound_overlap(compound_particle *c,header *t){
@@ -69,7 +68,7 @@ int patch_energy(particle *p,particle *q,double r2){
 	}
 	return b;
 }
-	//if(p->flag==q->flag)return 0;
+//if(p->flag==q->flag)return 0;
 //#if defined(TYPE)
 //	if(p->type==q->type)return 0;
 //#endif
@@ -178,21 +177,21 @@ int particle_energy_hash2(particle *p){
 	p->en_new=0;
 	for(i=0,b=0;i<p->nd;i++){
 		q=p->nd_list[i];
+		r2=p->nd_r2[i];
+		*q->qp_rij=p->nd_rij[i];
+		d2=SQR((p->sigma_well+q->sigma_well)*0.5);
+		if(r2<d2){
+			b+=patch_energy(p,q,r2);
+		}
+	}
+	return b;
+}
 		//if(q->c!=p->c){ //only particle of different compounds interact
 			//rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
 			//r2=length2(rij);
 			//*q->qp_rij=rij;
-			r2=p->nd_r2[i];
-			*q->qp_rij=p->nd_rij[i];
 			//r2=q->qp_r2;
-			d2=SQR((p->sigma_well+q->sigma_well)*0.5);
-			if(r2<d2){
-				b+=patch_energy(p,q,r2);
-			}
 		//}
-	}
-	return b;
-}
 int all_particle_energy_hash(header *t,int *en){
 	unsigned int i,h;
 	int k;
@@ -243,7 +242,8 @@ int checksum(FILE *f,header *t,int energy){
 	int energy_check=0;
 	int overlap;
 	overlap=all_particle_energy_hash(t,&energy_check);
-	fprintf(f,RESET"energy="RED"%d"RESET" energy_check="RED"%d %d\n"RESET,energy,energy_check,overlap);
+	if(overlap==-1)fprintf(f,"detected "RED"overlap\n"RESET);
+	fprintf(f,RESET"energy="RED"%d"RESET" energy_check="RED"%d\n"RESET,energy,energy_check);
 	if(energy==energy_check){
 		fprintf(f,RESET"Checksum: "GREEN"pass\n"RESET);
 		return 0;

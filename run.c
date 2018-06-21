@@ -142,15 +142,13 @@ int run(header *t,mySDL *s){
 		//for(ncycle=0;ncycle<10;ncycle++){
 		for(ncycle=0;ncycle<2*t->nparticle;ncycle++){
 			//Translation and Rotation
-			//q=rnd_particle(t);
 			c=rnd_compound(t);
-			//if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
+			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
 				acc_move[mc_move(c,t,&energy)]++;	
+			}
+			else{
 				acc_rotate[mc_rotate(c,t,&energy)]++;
-			//}
-			//else{
-				//acc_rotate[mc_rotate(q,t,&energy)]++;
-			//}
+			}
 		}
 			// Grand canonical moves
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
