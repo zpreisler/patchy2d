@@ -88,15 +88,14 @@ void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
 }
-
 int run(header *t,mySDL *s){
 	//Main routine -- Running the simulation
 	long long int i;
 	unsigned int ncycle;
-	particle *q;
+	//particle *q;
 	compound_particle *c;
 	int energy=0;
-
+	//Open files
 	FILE *fen=open_file2(t->name,".en","w");
 	FILE *frho=open_file2(t->name,".rho","w");
 	FILE *fvol=open_file2(t->name,".vol","w");
@@ -104,7 +103,7 @@ int run(header *t,mySDL *s){
 	double rho;
 	double vol;
 	time_t t1,t2;
-
+	//Optimization
 	int acc_move[2]={0,0};
 	int acc_rotate[2]={0,0};
 	int acc_volume[2]={0,0};
@@ -140,12 +139,14 @@ int run(header *t,mySDL *s){
 				break;
 		}
 		//Monte Carlo cycle
+		//for(ncycle=0;ncycle<10;ncycle++){
 		for(ncycle=0;ncycle<2*t->nparticle;ncycle++){
 			//Translation and Rotation
-			q=rnd_particle(t);
+			//q=rnd_particle(t);
 			c=rnd_compound(t);
 			//if(0.5<dsfmt_genrand_open_open(&dsfmt)||!q->npatch){
 				acc_move[mc_move(c,t,&energy)]++;	
+				acc_rotate[mc_rotate(c,t,&energy)]++;
 			//}
 			//else{
 				//acc_rotate[mc_rotate(q,t,&energy)]++;

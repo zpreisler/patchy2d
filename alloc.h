@@ -1,6 +1,6 @@
 #ifndef ALLOC_H
 #define ALLOC_H
-#define NLIST 24 
+#define NLIST 48
 #define MIN_ALLOC 2048
 #define M_ALLOC 2
 #define max(a,b) ((a)>(b)?(a):(b))
