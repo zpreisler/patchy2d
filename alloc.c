@@ -79,7 +79,9 @@ void map_pmem(particle *p,particle_memory *pmem,unsigned k){
 	p->new_list=(particle**)alloc(NLIST*sizeof(particle*));
 	p->old_list=(particle**)alloc(NLIST*sizeof(particle*));
 	p->nd_list=(particle**)alloc(NLIST*sizeof(particle*));
-	p->nd_d2=(double*)alloc(NLIST*sizeof(double));
+	//p->nd_d2=(double*)alloc(NLIST*sizeof(double));
+	p->nd_r2=(double*)alloc(NLIST*sizeof(double));
+	p->nd_rij=(__m128d*)alloc(NLIST*sizeof(__m128d));
 	//id
 	p->n=k;
 }

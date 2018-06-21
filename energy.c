@@ -25,6 +25,8 @@ int overlap(particle *p,header *t){
 						//Overlap
 						return 1;
 					}
+					p->nd_r2[p->nd]=r2;
+					p->nd_rij[p->nd]=rij;
 					p->nd_list[p->nd++]=q;
 					*q->qp_rij=rij;
 					q->qp_r2=r2;
@@ -147,6 +149,7 @@ int particle_energy_hash(particle *p,header *t){
 	}
 	return b;
 }
+/*
 int particle_energy_hash2(particle *p){
 	unsigned int i;
 	int b;
@@ -165,19 +168,22 @@ int particle_energy_hash2(particle *p){
 	}
 	return b;
 }
-int particle_energy_hash2m(particle *p,header *t){
+*/
+int particle_energy_hash2(particle *p){
 	unsigned int i;
 	int b;
 	double r2,d2;
 	particle *q;
-	__m128d rij;
+	//__m128d rij;
 	p->en_new=0;
 	for(i=0,b=0;i<p->nd;i++){
 		q=p->nd_list[i];
 		//if(q->c!=p->c){ //only particle of different compounds interact
-			rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
-			r2=length2(rij);
-			*q->qp_rij=rij;
+			//rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
+			//r2=length2(rij);
+			//*q->qp_rij=rij;
+			r2=p->nd_r2[i];
+			*q->qp_rij=p->nd_rij[i];
 			//r2=q->qp_r2;
 			d2=SQR((p->sigma_well+q->sigma_well)*0.5);
 			if(r2<d2){

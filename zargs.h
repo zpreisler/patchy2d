@@ -43,7 +43,10 @@ typedef struct particle{
 	void *specie; //poiter to the beging of the array of the particles of the same specie
 	//Energy
 	unsigned int en_new,en_old;	
-	unsigned nd; // number of bonds
+	unsigned nd; // number of cell neighbours
+	double *nd_r2;
+	__m128d *nd_rij;
+	//
 	__m128d *q; //position
 	__m128d *q_tmp; //old position
 	__m128d *q_track; //track -- for Einstein solid calculations
@@ -63,7 +66,7 @@ typedef struct particle{
 	unsigned n; //ID
 	//HASH
 	unsigned h;
-	double *nd_d2;
+	//double *nd_d2;
 	struct particle **nd_list;
 	struct particle **new_list,**old_list;
 	struct particle *next,**prev;

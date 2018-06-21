@@ -28,15 +28,15 @@ int c_en_old(compound_particle *c){
 	}
 	return en_old;
 }
-int c_en_new(compound_particle *c,header *t){
+int c_en_new(compound_particle *c){
 	int i;
 	int en_new=0;
 	particle *p;
 	for(i=0;i<c->nparticle;i++){
 		p=c->p+i;
 		//en_new+=particle_energy_hash(p,t);
-		//en_new+=particle_energy_hash2(p);
-		en_new+=particle_energy_hash2m(p,t);
+		//en_new+=particle_energy_hash2m(p,t);
+		en_new+=particle_energy_hash2(p);
 	}
 	return en_new;
 }
@@ -82,7 +82,7 @@ int mc_move(compound_particle *c,header *t,int *en){
 		return 1;
 	}
 	//enn=particle_energy_hash2(p);
-	enn=c_en_new(c,t);
+	enn=c_en_new(c);
 	de=enn-eno;
 	rmd=dsfmt_genrand_open_open(&dsfmt);
 	if(rmd<exp(t->epsilon*de)){
@@ -124,7 +124,7 @@ int mc_rotate(compound_particle *c,header *t,int *en){
 		return 1;
 	}
 	//enn=particle_energy_hash2(p);
-	enn=c_en_new(c,t);
+	enn=c_en_new(c);
 	de=enn-eno;
 	rmd=dsfmt_genrand_open_open(&dsfmt);
 	if(rmd<exp(t->epsilon*de)){
