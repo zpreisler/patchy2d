@@ -108,6 +108,7 @@ typedef struct species{
 	//
 	unsigned int compound; //0: simple particle; 1: it is a particle compound
 	unsigned int nppc; //number of particles per compound
+	double rod_length;
 	unsigned int ncompound,ncompound_alloc; //number of compounds
 	unsigned int nparticle,nparticle_alloc; //number of particles
 	unsigned int npatches,npatches_alloc; //number of all patches

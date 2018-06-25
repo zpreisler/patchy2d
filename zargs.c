@@ -11,6 +11,7 @@ species *alloc_specie(void){
 	species *s=(species*)alloc(sizeof(species));
 	s->compound=0; //set a simple particle
 	s->nppc=1; //set 1 particle per compound by default
+	s->rod_length=2.0;
 	s->flag=0;
 	s->sigma=1.0;
 	s->sigma_well=1.0; //set an interaction length
@@ -444,6 +445,7 @@ void set_args(header *t){
 		{.short_opt='l',.long_opt="sigma_well",.key="interaction_length:",.flag=ARG_DOUBLE,.off=offsetof(species,sigma_well),.help="Interaction length"},
 		{.long_opt="npatch",.key="number_of_patches:",.flag=ARG_INT,.off=offsetof(species,npatch),.help="Number of patches"},
 		{.long_opt="nppc",.key="number_of_particles_per_compound:",.flag=ARG_INT,.off=offsetof(species,nppc),.help="Number of particles per compound"},
+		{.short_opt='L',.long_opt="rod_length",.key="rod_length:",.flag=ARG_DOUBLE,.off=offsetof(species,rod_length),.help="Rod length"},
 		{.long_opt="interaction_matrix",.key="interaction_matrix:",.flag=ARG_LFVEC2,.off=offsetof(species,interaction_matrix),.n=offsetof(species,npatch),.help="Interaction matrix"},
 		{.long_opt="type",.key="patch_type:",.flag=ARG_STRING,.off=offsetof(species,patch_type),.help="Patch type"},
 		{.short_opt='w',.long_opt="patch_width",.key="patch_width:",.flag=ARG_DOUBLE,.off=offsetof(species,patch_width),.help="Patch width"},

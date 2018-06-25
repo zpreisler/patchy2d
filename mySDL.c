@@ -49,8 +49,8 @@ mySDL *mySDLinit(){
 	//Define window
 	s->window=SDL_CreateWindow("SDL",
 			SDL_WINDOWPOS_UNDEFINED,
-			//SDL_WINDOWPOS_UNDEFINED,640,480,
-			SDL_WINDOWPOS_UNDEFINED,480,480,
+			SDL_WINDOWPOS_UNDEFINED,640,640,
+			//SDL_WINDOWPOS_UNDEFINED,128,128,
 			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 	s->glcontext=SDL_GL_CreateContext(s->window);
 	SDL_GetWindowSize(s->window,&s->w,&s->h);

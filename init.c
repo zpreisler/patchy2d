@@ -14,13 +14,34 @@
 #include "patches.h"
 #include "alloc.h"
 extern dsfmt_t dsfmt;
+//void construct_particle(compound_particle *c,header *t){
+void construct_particle(compound_particle *c){
+	int i;
+	species *specie=c->specie;
+	particle *p;
+	double l=specie->rod_length;
+	double l0;
+	if(specie->nppc>1){
+		l0=1.0/(specie->nppc-1);
+	}
+	else l0=0.0;
+	//printf("l0 %lf\n",l0);
+	for(i=0;i<c->nparticle;i++){
+		p=c->p+i;
+		*(p)->q=*(c)->q+*(c)->or*(i*l0-0.5)*l;
+		//printf("-: %lf\n",(i*l0-0.5)*l);
+		*(p)->or=*(c)->or;
+		//boundary(p->q,t->box);
+	}
+}
 void pre_set_particle(compound_particle *c,header *t){
 	int i;
 	particle *p;
+	construct_particle(c);
 	for(i=0;i<c->nparticle;i++){
 		p=c->p+i;
-		*(p)->q=*(c)->q+*(c)->or*i*0.5;
-		*(p)->or=*(c)->or;
+		//*(p)->q=*(c)->q+*(c)->or*i*0.5;
+		//*(p)->or=*(c)->or;
 		boundary(p->q,t->box);
 	}
 }
@@ -36,10 +57,11 @@ void set_particle(compound_particle *c,header *t){
 void reset_particle(compound_particle *c,header *t){
 	int i;
 	particle *p;
+	construct_particle(c);
 	for(i=0;i<c->nparticle;i++){
 		p=c->p+i;
-		*(p)->q=*(c)->q+*(c)->or*i*0.5;
-		*(p)->or=*(c)->or;
+		//*(p)->q=*(c)->q+*(c)->or*i*0.5;
+		//*(p)->or=*(c)->or;
 		boundary(p->q,t->box);
 		set_patches(p);
 		hash_reinsert(p,t->h1,t->table);
