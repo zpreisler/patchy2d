@@ -22,16 +22,48 @@
 #include "init.h"
 //#include "postscript.h"
 extern dsfmt_t dsfmt;
-int mc_npt(header *t,int *en){
+void compress(header *t,double xnew){
 	unsigned int i;
+	compound_particle *c;
+	particle *p;
+	for(i=0;i<t->nparticle;i++){
+		p=t->p+i;	
+		*(p)->q_tmp=*(p)->q;
+		list_swap(p);
+	}
+	for(i=0;i<t->ncompound;i++){
+		c=t->c+i;	
+		*(c)->q_tmp=*(c)->q;
+		*(c)->q*=xnew;
+		reset_particle(c,t);
+	}
+}
+void compress_reset(header *t){
+	unsigned int i;
+	compound_particle *c;
+	particle *p;
+	for(i=0;i<t->ncompound;i++){
+		c=t->c+i;	
+		*(c)->q=*(c)->q_tmp;
+	}
+	for(i=0;i<t->nparticle;i++){
+		p=t->p+i;	
+		*(p)->q=*(p)->q_tmp;
+		list_swap(p);
+		hash_reinsert(p,t->h1,t->table);
+	}
+}
+int mc_npt(header *t,int *en){
+	//unsigned int i;
 	int enn,eno,de;
 	double vol,vol_new,xnew;
 	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
 	double dv=t->max_vol*rnd*t->nparticle;
 	double acc;
 	double bp;
-	species *s;
-	particle *q;
+	//species *s;
+	//particle *q;
+	//compound_particle *c;
 	vol=t->box[0]*t->box[1];
 	vol_new=vol+dv;
 	xnew=sqrt(vol_new/vol);
@@ -40,8 +72,8 @@ int mc_npt(header *t,int *en){
 	t->box*=xnew;
 	hash1(t);
 	hash_lists(t); //FIXME but only if number of the cells changes
-	s=t->specie;
-	while(s){
+	//s=t->specie;
+	/*while(s){
 		for(i=0;i<s->nparticle;i++){
 			q=(particle*)s->p+i;
 			*(q)->q_tmp=*(q)->q;
@@ -50,13 +82,15 @@ int mc_npt(header *t,int *en){
 			hash_reinsert(q,t->h1,t->table);
 		}
 		s=s->next;
-	}
+	}*/
+	compress(t,xnew);
 	int ennb=0;
 	ennb=all_particle_energy_hash(t,&enn);
 	de=enn-eno;
 	bp=t->pressure*fabs(t->epsilon); //betap
 	if(ennb!=-1){
-		acc=de*t->epsilon-bp*dv+t->nparticle*log(vol_new/vol);
+		//acc=de*t->epsilon-bp*dv+t->nparticle*log(vol_new/vol);
+		acc=de*t->epsilon-bp*dv+t->ncompound*log(vol_new/vol);
 		rnd=dsfmt_genrand_open_open(&dsfmt);
 		if(rnd<exp(acc)){
 			*en=enn;
@@ -66,7 +100,8 @@ int mc_npt(header *t,int *en){
 	t->box=box;
 	hash1(t);
 	hash_lists(t);
-	s=t->specie;
+	compress_reset(t);
+	/*s=t->specie;
 	while(s){
 		for(i=0;i<s->nparticle;i++){
 			q=(particle*)s->p+i;
@@ -75,7 +110,7 @@ int mc_npt(header *t,int *en){
 			hash_reinsert(q,t->h1,t->table);
 		}
 		s=s->next;
-	}
+	}*/
 	return 1;
 }
 int mc_npt_xy(header *t,int *en){

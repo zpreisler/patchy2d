@@ -150,9 +150,9 @@ int run(header *t,mySDL *s){
 				acc_rotate[mc_rotate(c,t,&energy)]++;
 			}
 
-			if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-				mc_gc(t,&energy);
-			}
+			//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+			//	mc_gc(t,&energy);
+			//}
 		}
 			// Grand canonical moves
 		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
@@ -163,7 +163,7 @@ int run(header *t,mySDL *s){
 			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
 			//acc_shape[mc_uy(t,&energy)]++;
 			//printf("volume %lf\n",t->uy);
-			//acc_volume[mc_npt(t,&energy)]++;
+			acc_volume[mc_npt(t,&energy)]++;
 		}
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);

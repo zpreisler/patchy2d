@@ -40,6 +40,7 @@ void count_particles(header *t){
 compound_memory *alloc_cmem(unsigned size){
 	compound_memory *cmem=(compound_memory*)alloc(sizeof(compound_memory));	
 	cmem->q=(__m128d*)alloc(size*sizeof(__m128d));
+	cmem->q_tmp=(__m128d*)alloc(size*sizeof(__m128d));
 	cmem->or=(__m128d*)alloc(size*sizeof(__m128d));
 	return cmem;
 }
@@ -63,6 +64,7 @@ patch_memory *alloc_smem(unsigned size){
 }
 void map_cmem(compound_particle *c,compound_memory *cmem,unsigned k){
 	c->q=cmem->q+k;
+	c->q_tmp=cmem->q_tmp+k;
 	c->or=cmem->or+k;
 	//id
 	c->n=k;

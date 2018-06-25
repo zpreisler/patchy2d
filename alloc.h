@@ -20,6 +20,7 @@ typedef struct particle_memory{
 }particle_memory;
 typedef struct compound_memory{
 	__m128d *q; //compound position;
+	__m128d *q_tmp;
 	__m128d *or; //compound orientation;
 }compound_memory;
 extern particle *alloc_particles(header *t);
