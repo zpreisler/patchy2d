@@ -87,6 +87,7 @@ typedef struct compound_particle{
 	void *specie; //pointer to the beging of the array of the compounds of the same specie
 	int id;
 	int nparticle;
+	int npatch;
 	unsigned int flag,n; //flag, ID;
 	__m128d *q; //compound position;
 	__m128d *or; //compound orientation;

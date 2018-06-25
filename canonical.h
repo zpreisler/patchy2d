@@ -12,6 +12,9 @@ extern particle *rnd_specie(species *s);
 //extern int mc_move(particle *p,header *t,int *en);
 //extern int mc_rotate(particle *p,header *t,int *en);
 
+extern int c_en_old(compound_particle *c);
+extern int c_en_new(compound_particle *c);
+
 extern int mc_move(compound_particle *c,header *t,int *en);
 extern int mc_rotate(compound_particle *c,header *t,int *en);
 #endif

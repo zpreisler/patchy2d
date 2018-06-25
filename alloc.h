@@ -1,7 +1,7 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 #define NLIST 48
-#define MIN_ALLOC 2048
+#define MIN_ALLOC 4096
 #define M_ALLOC 2
 #define max(a,b) ((a)>(b)?(a):(b))
 typedef struct patch_memory{
