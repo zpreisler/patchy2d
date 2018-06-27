@@ -6,6 +6,7 @@
 #include <utils.h>
 #include "program_gl.h"
 #include "mySDL.h"
+#include <png.h>
 #define MAX_SOURCE_SIZE (0x100000)
 void mySDLresize(mySDL *s){
 	//Routines for window resizing
@@ -130,6 +131,19 @@ void mySDLdisplay(mySDL *s){
 
 	SDL_GL_SwapWindow(s->window);
 }
+void mySLDbuffer(mySDL *s){
+	glClearColor(1.0,1.0,1.0,1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	//Draw
+	glUseProgram(s->program[0]);
+	glBindVertexArray(s->vao[0]);
+	glDrawArrays(GL_POINTS,0,s->n);
+	//Draw
+	glUseProgram(s->program[1]);
+	glBindVertexArray(s->vao[1]);
+	//glLineWidth(20.0f);
+	glDrawArrays(GL_LINE_LOOP,0,4);
+}
 void m128d2float(__m128d *a,float *b,int n){
 	int i,j;
 	double *c;
@@ -148,4 +162,34 @@ void mySDLsetcolor(float *b,float *color,int n){
 			*(b+j+k)=*(color+k);
 		}
 	}
+}
+void save_png(char *name,mySDL *s){
+//void save_png(char *name){
+	FILE *f=open_file2(name,".png","w");
+	mySLDbuffer(s);
+	png_structp png_ptr=png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
+	png_infop png_info;
+	png_info=png_create_info_struct(png_ptr);
+	setjmp(png_jmpbuf(png_ptr));
+	png_init_io(png_ptr,f);
+	png_set_IHDR(png_ptr,png_info,640,640,8,PNG_COLOR_TYPE_RGB,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,PNG_FILTER_TYPE_DEFAULT);
+	unsigned char data[3*640*640],argb[4*640*640];
+	unsigned char *rows[640];
+	int i,j,i1,i2;
+	glReadPixels(0,0,640,640,GL_BGRA,GL_UNSIGNED_INT_8_8_8_8,argb);
+	for (i=0;i<640;++i){
+		rows[640-i-1]=data+(i*640*3);
+		for(j=0;j<640;++j){
+			i1=(i*640+j)*3;
+			i2=(i*640+j)*4;
+			data[i1++]=argb[++i2];
+			data[i1++]=argb[++i2];
+			data[i1++]=argb[++i2];
+		}
+	}
+	png_set_rows(png_ptr,png_info,rows);
+	png_write_png(png_ptr,png_info,PNG_TRANSFORM_IDENTITY,NULL);
+	png_write_end(png_ptr,png_info);
+	png_destroy_write_struct(&png_ptr,NULL);
+	close_file(f);
 }

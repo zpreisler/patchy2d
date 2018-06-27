@@ -30,4 +30,6 @@ extern void mySDLboundary(mySDL *s,float *b);
 extern void mySDLdisplay(mySDL *s);
 extern void m128d2float(__m128d *a,float *b,int n);
 extern void mySDLsetcolor(float *b,float *color,int n);
+
+extern void save_png(char *name,mySDL *s);
 #endif

@@ -200,6 +200,7 @@ int run(header *t,mySDL *s){
 		}
 	}
 	mySDLdisplay(s);
+	save_png(t->name,s);
 	//find_all_cycles(t);
 	close_file(fen);
 	checksum(stdout,t,energy);

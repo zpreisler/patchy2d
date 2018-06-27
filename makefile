@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O2 -Wall -Wextra -DHAVE_SSE2 -DDSFMT_MEXP=4253 -fomit-frame-pointer -DHAVE_SSE2 -msse -msse2 -msse3 -msse4 -msse4.1 -march='native'
-CLIBS=-I $(HOME)/include -L $(HOME)/lib -lutils -lGL -lGLEW  -lm
+CLIBS=-I $(HOME)/include -L $(HOME)/lib -lutils -lGL -lGLEW  -lm -lpng
 SDL_LIBS=-lSDL2 -lSDL2main
 EXEC=patchy2d
 INSTALL=install -m 111
