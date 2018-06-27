@@ -42,6 +42,7 @@ compound_memory *alloc_cmem(unsigned size){
 	cmem->q=(__m128d*)alloc(size*sizeof(__m128d));
 	cmem->q_tmp=(__m128d*)alloc(size*sizeof(__m128d));
 	cmem->or=(__m128d*)alloc(size*sizeof(__m128d));
+	cmem->or_well=(__m128d*)alloc(size*sizeof(__m128d));
 	return cmem;
 }
 particle_memory *alloc_pmem(unsigned size){
@@ -66,6 +67,7 @@ void map_cmem(compound_particle *c,compound_memory *cmem,unsigned k){
 	c->q=cmem->q+k;
 	c->q_tmp=cmem->q_tmp+k;
 	c->or=cmem->or+k;
+	c->or_well=cmem->or_well+k;
 	//id
 	c->n=k;
 }

@@ -102,11 +102,17 @@ int mc_move(compound_particle *c,header *t,int *en){
 int mc_rotate(compound_particle *c,header *t,int *en){
 	int eno=0,enn=0;
 	int de;
+	//int k;
 	double rmd;
 	double w=t->max_rotation*(dsfmt_genrand_open_open(&dsfmt)-0.5);
+	//double a;
 	//double rnd=dsfmt_genrand_open_open(&dsfmt);
 	__m128d or0=*c->or;
 	*c->or=rot2w(*c->or,w);
+	//k=dsfmt_genrand_open_open(&dsfmt)*3.0;
+	//a=(double)k/3.0*M_PI;
+	//*(c)->or=sincosa(a);
+
 	reset_particle(c,t);
 	//boundary(p->q,t->box);
 	//hash_reinsert(p,t->h1,t->table);

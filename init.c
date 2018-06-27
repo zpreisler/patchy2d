@@ -74,12 +74,15 @@ int init_configuration_random(header *t){
 	species *s=t->specie;
 	while(s){
 		for(i=0;i<s->ncompound;i++){
-			k=0;
 			c=(compound_particle*)(s->c+i);
 			a=2.0*M_PI*dsfmt_genrand_open_open(&dsfmt);
+			k=dsfmt_genrand_open_open(&dsfmt)*3.0;
+			a=(double)k/3.0*M_PI;
+			k=0;
 			do{
 				*(c)->q=t->box*rnd11();
 				*(c)->or=sincosa(a);
+				*(c)->or_well=(__m128d){1.0,0.0};
 				pre_set_particle(c,t);
 				k++;
 				if(k>4096){

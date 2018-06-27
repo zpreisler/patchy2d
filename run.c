@@ -21,6 +21,7 @@
 #include "canonical.h"
 #include "grand_canonical.h"
 #include "npt.h"
+#include "restricted.h"
 //Graphics
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -139,32 +140,31 @@ int run(header *t,mySDL *s){
 				break;
 		}
 		//Monte Carlo cycle
-		//for(ncycle=0;ncycle<10;ncycle++){
-		for(ncycle=0;ncycle<2*t->nparticle;ncycle++){
+		for(ncycle=0;ncycle<t->nparticle;ncycle++){
 			//Translation and Rotation
 			c=rnd_compound(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
 				acc_move[mc_move(c,t,&energy)]++;	
 			}
-			else{
-				acc_rotate[mc_rotate(c,t,&energy)]++;
+			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
+				//acc_rotate[mc_rotate(c,t,&energy)]++;
+				acc_rotate[mc_rotate_restricted(c,t,&energy)]++;
 			}
-
-			//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-			//	mc_gc(t,&energy);
+			//if(0.0000064>dsfmt_genrand_open_open(&dsfmt)){
+			//	mc_gc_restricted(t,&energy);
 			//}
 		}
-			// Grand canonical moves
-		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-		//	mc_gc(t,&energy);
-		//}
+		// Grand canonical moves
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-			//acc_volume_xy[mc_npt_xy(t,&energy)]++;
-			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
-			//acc_shape[mc_uy(t,&energy)]++;
-			//printf("volume %lf\n",t->uy);
-			acc_volume[mc_npt(t,&energy)]++;
+				mc_gc_restricted(t,&energy);
+		//	mc_gc(t,&energy);
 		}
+		/*if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+			acc_volume_xy[mc_npt_xy(t,&energy)]++;
+			acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
+			//acc_shape[mc_uy(t,&energy)]++; //FIXME
+			acc_volume[mc_npt(t,&energy)]++;
+		}*/
 		if(!(i%(t->mod*t->pmod))){
 			time(&t2);
 			en=(double)energy/(double)t->nparticle;

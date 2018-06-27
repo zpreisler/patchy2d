@@ -65,11 +65,14 @@ int delete_compound(header *t,compound_particle *c,compound_particle *d){
 	return 0;
 }
 int pre_insert_compound(header *t,compound_particle *c,int *en){
-	int i;
+	int i,k;
 	double a=2.0*M_PI*dsfmt_genrand_open_open(&dsfmt);
+	k=dsfmt_genrand_open_open(&dsfmt)*3.0;
+	a=(double)k/3.0*M_PI;
 	particle *p;
 	*(c)->q=t->box*rnd11();
 	*(c)->or=sincosa(a);
+	*(c)->or_well=(__m128d){1.0,0.0};
 	pre_set_particle(c,t);
 	for(i=0;i<c->nparticle;i++){
 		p=c->p+i;

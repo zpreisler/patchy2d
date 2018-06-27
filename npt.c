@@ -38,6 +38,22 @@ void compress(header *t,double xnew){
 		reset_particle(c,t);
 	}
 }
+void compress_m128d(header *t,__m128d f){
+	unsigned int i;
+	compound_particle *c;
+	particle *p;
+	for(i=0;i<t->nparticle;i++){
+		p=t->p+i;	
+		*(p)->q_tmp=*(p)->q;
+		list_swap(p);
+	}
+	for(i=0;i<t->ncompound;i++){
+		c=t->c+i;	
+		*(c)->q_tmp=*(c)->q;
+		*(c)->q*=f;
+		reset_particle(c,t);
+	}
+}
 void compress_reset(header *t){
 	unsigned int i;
 	compound_particle *c;
@@ -61,9 +77,7 @@ int mc_npt(header *t,int *en){
 	double dv=t->max_vol*rnd*t->nparticle;
 	double acc;
 	double bp;
-	//species *s;
-	//particle *q;
-	//compound_particle *c;
+	int ennb=0;
 	vol=t->box[0]*t->box[1];
 	vol_new=vol+dv;
 	xnew=sqrt(vol_new/vol);
@@ -72,25 +86,67 @@ int mc_npt(header *t,int *en){
 	t->box*=xnew;
 	hash1(t);
 	hash_lists(t); //FIXME but only if number of the cells changes
-	//s=t->specie;
-	/*while(s){
+	compress(t,xnew);
+	ennb=all_particle_energy_hash(t,&enn);
+	de=enn-eno;
+	bp=t->pressure*fabs(t->epsilon); //betap
+	if(ennb!=-1){
+		acc=de*t->epsilon-bp*dv+t->ncompound*log(vol_new/vol);
+		rnd=dsfmt_genrand_open_open(&dsfmt);
+		if(rnd<exp(acc)){
+			*en=enn;
+			return 0;
+		}
+	}
+	t->box=box;
+	hash1(t);
+	hash_lists(t);
+	compress_reset(t);
+	return 1;
+}
+int mc_npt_xy(header *t,int *en){
+	//unsigned int i;
+	int enn,eno,de;
+	double vol,vol_new;//,xnew;
+	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
+	double dx=t->max_xy*rnd;
+	double dv;
+	double acc;
+	double bp;
+	unsigned int d=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*2);
+	int ennb=0;
+	//species *s;
+	//particle *q;
+	__m128d box=t->box;
+	__m128d f;
+	eno=*en;
+	vol=t->box[0]*t->box[1];
+	if(t->box[d]+dx<3*t->hash_cell[d]){
+		return 1;
+	}
+	t->box[d]+=dx;
+	f=t->box/box;
+	vol_new=t->box[0]*t->box[1];
+	dv=vol_new-vol;
+	hash1(t);
+	hash_lists(t); //FIXME but only if number of the cells changes
+	/*s=t->specie;
+	while(s){
 		for(i=0;i<s->nparticle;i++){
 			q=(particle*)s->p+i;
 			*(q)->q_tmp=*(q)->q;
-			*(q)->q*=xnew;
+			*(q)->q*=f;
 			list_swap(q);
 			hash_reinsert(q,t->h1,t->table);
 		}
 		s=s->next;
 	}*/
-	compress(t,xnew);
-	int ennb=0;
+	compress_m128d(t,f);
 	ennb=all_particle_energy_hash(t,&enn);
 	de=enn-eno;
 	bp=t->pressure*fabs(t->epsilon); //betap
 	if(ennb!=-1){
-		//acc=de*t->epsilon-bp*dv+t->nparticle*log(vol_new/vol);
-		acc=de*t->epsilon-bp*dv+t->ncompound*log(vol_new/vol);
+		acc=de*t->epsilon-bp*dv+t->nparticle*log(vol_new/vol);
 		rnd=dsfmt_genrand_open_open(&dsfmt);
 		if(rnd<exp(acc)){
 			*en=enn;
@@ -113,71 +169,8 @@ int mc_npt(header *t,int *en){
 	}*/
 	return 1;
 }
-int mc_npt_xy(header *t,int *en){
-	unsigned int i;
-	int enn,eno,de;
-	double vol,vol_new;//,xnew;
-	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
-	double dx=t->max_xy*rnd;
-	double dv;
-	double acc;
-	double bp;
-	unsigned int d=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*2);
-	species *s;
-	particle *q;
-	__m128d box=t->box;
-	__m128d f;
-	eno=*en;
-	vol=t->box[0]*t->box[1];
-	if(t->box[d]+dx<3*t->hash_cell[d]){
-		return 1;
-	}
-	t->box[d]+=dx;
-	f=t->box/box;
-	vol_new=t->box[0]*t->box[1];
-	dv=vol_new-vol;
-	hash1(t);
-	hash_lists(t); //FIXME but only if number of the cells changes
-	s=t->specie;
-	while(s){
-		for(i=0;i<s->nparticle;i++){
-			q=(particle*)s->p+i;
-			*(q)->q_tmp=*(q)->q;
-			*(q)->q*=f;
-			list_swap(q);
-			hash_reinsert(q,t->h1,t->table);
-		}
-		s=s->next;
-	}
-	int ennb=0;
-	ennb=all_particle_energy_hash(t,&enn);
-	de=enn-eno;
-	bp=t->pressure*fabs(t->epsilon); //betap
-	if(ennb!=-1){
-		acc=de*t->epsilon-bp*dv+t->nparticle*log(vol_new/vol);
-		rnd=dsfmt_genrand_open_open(&dsfmt);
-		if(rnd<exp(acc)){
-			*en=enn;
-			return 0;
-		}
-	}
-	t->box=box;
-	hash1(t);
-	hash_lists(t);
-	s=t->specie;
-	while(s){
-		for(i=0;i<s->nparticle;i++){
-			q=(particle*)s->p+i;
-			*(q)->q=*(q)->q_tmp;
-			list_swap(q);
-			hash_reinsert(q,t->h1,t->table);
-		}
-		s=s->next;
-	}
-	return 1;
-}
 int mc_npt_dxdy(header *t,int *en){
-	unsigned int i;
+	//unsigned int i;
 	int enn,eno,de;
 	double vol,vol_new;//,xnew;
 	double rnd=dsfmt_genrand_open_open(&dsfmt)-0.5;
@@ -185,9 +178,10 @@ int mc_npt_dxdy(header *t,int *en){
 	double dv;
 	double acc;
 	double bp;
+	int ennb=0;
 	//unsigned int d=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*2);
-	species *s;
-	particle *q;
+	//species *s;
+	//particle *q;
 	__m128d box=t->box;
 	__m128d f;
 	eno=*en;
@@ -199,7 +193,7 @@ int mc_npt_dxdy(header *t,int *en){
 	dv=vol_new-vol;
 	hash1(t);
 	hash_lists(t); //FIXME but only if number of the cells changes
-	s=t->specie;
+	/*s=t->specie;
 	while(s){
 		for(i=0;i<s->nparticle;i++){
 			q=(particle*)s->p+i;
@@ -209,8 +203,8 @@ int mc_npt_dxdy(header *t,int *en){
 			hash_reinsert(q,t->h1,t->table);
 		}
 		s=s->next;
-	}
-	int ennb=0;
+	}*/
+	compress_m128d(t,f);
 	ennb=all_particle_energy_hash(t,&enn);
 	de=enn-eno;
 	bp=t->pressure*fabs(t->epsilon); //betap
@@ -225,7 +219,8 @@ int mc_npt_dxdy(header *t,int *en){
 	t->box=box;
 	hash1(t);
 	hash_lists(t);
-	s=t->specie;
+	compress_reset(t);
+	/*s=t->specie;
 	while(s){
 		for(i=0;i<s->nparticle;i++){
 			q=(particle*)s->p+i;
@@ -234,7 +229,7 @@ int mc_npt_dxdy(header *t,int *en){
 			hash_reinsert(q,t->h1,t->table);
 		}
 		s=s->next;
-	}
+	}*/
 	return 1;
 }
 
@@ -245,6 +240,7 @@ int mc_uy(header *t,int *en){
 	double dy=t->max_uy*rnd;
 	double acc;
 	double uy_old=t->uy;
+	int ennb=0;
 	species *s;
 	particle *q;
 	eno=*en;
@@ -262,7 +258,6 @@ int mc_uy(header *t,int *en){
 		}
 		s=s->next;
 	}
-	int ennb=0;
 	ennb=all_particle_energy_hash(t,&enn);
 	de=enn-eno;
 	if(ennb!=-1){

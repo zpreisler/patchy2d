@@ -91,7 +91,9 @@ typedef struct compound_particle{
 	unsigned int flag,n; //flag, ID;
 	__m128d *q; //compound position;
 	__m128d *q_tmp; //compound position;
+	__m128d *q_well;
 	__m128d *or; //compound orientation;
+	__m128d *or_well;
 }compound_particle;
 //hash table structure
 typedef struct hash_table{
