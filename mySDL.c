@@ -57,8 +57,10 @@ mySDL *mySDLinit(){
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	s->glew_status=glewInit();
 	//Create program -- load shaders
-	s->program[0]=create_program("shader.vert","shader.geom","shader.frag");
-	s->program[1]=create_program("boundry.vert","boundry.geom","boundry.frag");
+	//s->program[0]=create_program("shader.vert","shader.geom","shader.frag");
+	//s->program[1]=create_program("boundry.vert","boundry.geom","boundry.frag");
+	s->program[0]=create_program("/home/zdenek/Projects/patchy2d/shader.vert","/home/zdenek/Projects/patchy2d/shader.geom","/home/zdenek/Projects/patchy2d/shader.frag");
+	s->program[1]=create_program("/home/zdenek/Projects/patchy2d/boundry.vert","/home/zdenek/Projects/patchy2d/boundry.geom","/home/zdenek/Projects/patchy2d/boundry.frag");
 	//s->program[1]=create_program("boundry.vert",NULL,"boundry.frag");
 	//Assign uniforms
 	s->proj_matrix_loc=glGetUniformLocation(s->program[0],"proj_matrix");
@@ -142,7 +144,7 @@ void mySLDbuffer(mySDL *s){
 	glUseProgram(s->program[1]);
 	glBindVertexArray(s->vao[1]);
 	//glLineWidth(20.0f);
-	glDrawArrays(GL_LINE_LOOP,0,4);
+	//glDrawArrays(GL_LINE_LOOP,0,4);
 }
 void m128d2float(__m128d *a,float *b,int n){
 	int i,j;

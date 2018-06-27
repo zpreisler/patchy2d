@@ -116,6 +116,8 @@ int run(header *t,mySDL *s){
 	int *acc[]={acc_move,acc_rotate,acc_volume,acc_volume_xy,acc_volume_dxdy,acc_shape};
 	double *mmax[]={&(t->max_displacement[0]),&t->max_rotation,&t->max_vol,&t->max_xy,&t->max_dxdy,&t->max_uy};
 	double frac[6];
+	
+	int count=0;
 
 	signal(SIGINT,signal_safe_exit_int);
 	signal(SIGUSR1,signal_safe_exit);
@@ -182,6 +184,11 @@ int run(header *t,mySDL *s){
 
 			if(t->verbose){
 				print_npt_log(stdout,t,i,difftime(t2,t1),energy,frac);
+
+				char s_name[1024];
+				sprintf(s_name,"%s_%d",t->name,count++);
+				//printf("%s\n",s_name);
+				save_png(s_name,s);
 			}
 			//Update screen
 			//s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
