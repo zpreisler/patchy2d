@@ -17,6 +17,7 @@ all: $(TARGET)
 
 main: $(MAIN) $(OBJS)
 	$(CC) $(CFLAGS) $(MAIN) $(OBJS) -o $(EXEC) $(CLIBS) $(SDL_LIBS)
+	ctags *.{c,h}
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(CLIBS) $(SDL_LIBS)
