@@ -339,6 +339,8 @@ int read_input(int argc,char *argv[],input_files *input,header *t){
 		box=t->box;
 		t->box*=t->copy;
 
+		dsfmt_init_gen_rand(&dsfmt,t->seed);
+
 		printf(">>>Allocating particles\n");
 		alloc_particles(t);
 		init_patches(t);

@@ -135,6 +135,17 @@ typedef struct species{
 	double mu; //chemical potential 
 	double *interaction_matrix;
 }species;
+typedef struct files{
+	FILE *fepsilon; // inverse temperature
+	FILE *fmu;
+	FILE *fpressure;
+	FILE *fen; // U/N
+	FILE *frho; // N/V
+	FILE *fvol; //volume
+	FILE *fn; //number of particles 
+	FILE *ftime; //passed time
+	FILE *fstep; //passed MC steps
+}files;
 typedef struct header{
 	char name[NAME_LENGTH];
 	//unsigned int N,Nalloc;// number of particles, number of particles allocated
@@ -149,6 +160,7 @@ typedef struct header{
 	patch *s;
 	int nspecies;
 	//HASH
+	//////
 	int ndir;
 	__m128i *dir;
 	__m128i h;
@@ -158,17 +170,27 @@ typedef struct header{
 	__m128d copy;
 	hash_table *table;
 	//Arguments
+	///////////
 	arg_set argz;
+	//Energy
+	////////
+	int energy;
 	//Parameters
+	////////////
 	double epsilon,end_epsilon;
 	double pressure;
 	double uy;
-	//Printing and writing modulus
+	//Time
+	//////
+	time_t t1,t2;
+	//Printing and writing
+	//////////////////////
 	int mod,pmod;
 	int optimize;
 	int snapshot;
 	int verbose;
-	//Max displacment
+	//Max displacments
+	//////////////////
 	__m128d max_displacement;
 	double max_rotation;
 	double max_vol;
@@ -177,12 +199,18 @@ typedef struct header{
 	double max_uy;
 	double max_dsigma;
 	//Random seed
+	/////////////
 	int seed;
-	//Einstein
+	//Files
+	///////
+	files file;
+	//Einstein 
+	//////////
 	double lambda;
 	double lambda_coupling;
 	__m128d q_dcm;
 	//Graphs
+	////////
 	int ncycles;//number of cycles detected
 	particle **matrix_list;
 	void *adj_matrix;

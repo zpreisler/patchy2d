@@ -62,10 +62,12 @@ particle *rnd_specie(species *s){
 	unsigned int rnd=(unsigned)(dsfmt_genrand_open_open(&dsfmt)*s->nparticle);
 	return (particle*)s->p+rnd;
 }
-void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,double frac[4]){
+void print_log(FILE *f,header *t,long long int i,double time,double frac[4]){
 	double vol=t->box[0]*t->box[1];
 	double rho=(double)t->nparticle/vol;
-	fprintf(f,UGREEN"NPT\n"RESET
+	fprintf(f,UGREEN"LOG\n"RESET
+			CYAN"epsilon:"BLUE" %.3f "RESET
+			CYAN"mu:"BLUE" %.3f\n"RESET
 			CYAN"step:"BLUE" %Ld "RESET
 			CYAN"time:"BLUE" %.0lfs "RESET
 			CYAN"mod:"BLUE" %d "RESET
@@ -84,27 +86,81 @@ void print_npt_log(FILE *f,header *t,long long int i,double time,int energy,doub
 			BLACK"rotation:"PURPLE" %.2lf "RESET
 			BLACK"volume:"PURPLE" %.2lf "RESET
 			BLACK"shape:"PURPLE" %.2lf \n"RESET,
+			t->epsilon,t->specie->mu,
 			i,time,t->mod,t->pmod,
-			energy,(double)energy/t->nparticle,rho,t->uy,
+			t->energy,(double)t->energy/t->nparticle,rho,t->uy,
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
 }
-int run(header *t,mySDL *s){
-	//Main routine -- Running the simulation
-	long long int i;
-	unsigned int ncycle;
-	//particle *q;
-	compound_particle *c;
-	int energy=0;
-	//Open files
-	FILE *fen=open_file2(t->name,".en","w");
-	FILE *frho=open_file2(t->name,".rho","w");
-	FILE *fvol=open_file2(t->name,".vol","w");
+void open_files(header *t){
+	t->file.fepsilon=open_file2(t->name,".epsilon","w");
+	t->file.fmu=open_file2(t->name,".mu","w");
+	t->file.fpressure=open_file2(t->name,".pressure","w");
+	t->file.fen=open_file2(t->name,".en","w");
+	t->file.frho=open_file2(t->name,".rho","w");
+	t->file.fvol=open_file2(t->name,".vol","w");
+	t->file.fn=open_file2(t->name,".n","w");
+	t->file.ftime=open_file2(t->name,".time","w");
+	t->file.fstep=open_file2(t->name,".step","w");
+}
+void close_files(header *t){
+	close_file(t->file.fepsilon);
+	close_file(t->file.fmu);
+	close_file(t->file.fpressure);
+	close_file(t->file.fen);
+	close_file(t->file.frho);
+	close_file(t->file.fvol);
+	close_file(t->file.fn);
+	close_file(t->file.ftime);
+	close_file(t->file.fstep);
+}
+void write_files(header *t){
 	double en;
 	double rho;
 	double vol;
-	time_t t1,t2;
+	double n;
+
+	en=(double)t->energy/(double)t->nparticle;
+	rho=(double)t->nparticle/(t->box[0]*t->box[1]);
+	vol=(t->box[0]*t->box[1]);
+	n=t->ncompound;
+
+	//Write
+	///////
+	uwrite(&t->epsilon,sizeof(double),1,t->file.fepsilon);
+	uwrite(&t->specie->mu,sizeof(double),1,t->file.fmu);
+	uwrite(&t->pressure,sizeof(double),1,t->file.fpressure);
+
+	uwrite(&en,sizeof(double),1,t->file.fen);
+	uwrite(&rho,sizeof(double),1,t->file.frho);
+	uwrite(&vol,sizeof(double),1,t->file.fvol);
+	uwrite(&n,sizeof(double),1,t->file.fn);
+}
+void explore(header *t){
+	double rnd;
+	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
+	t->epsilon+=rnd;
+	if(t->epsilon<0.0)t->epsilon*=-1;
+	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
+	t->specie->mu+=rnd;
+}
+int run(header *t,mySDL *s){
+
+	//Main routine -- Running the simulation
+	////////////////////////////////////////
+	
+	long long int i;
+	unsigned int ncycle;
+	compound_particle *c;
+
+	//Open files
+	////////////
+	
+	open_files(t);
+
 	//Optimization
+	//////////////
+	
 	int acc_move[2]={0,0};
 	int acc_rotate[2]={0,0};
 	int acc_volume[2]={0,0};
@@ -119,17 +175,23 @@ int run(header *t,mySDL *s){
 	
 	int count=0;
 
+	//Signals
+	/////////
+	
 	signal(SIGINT,signal_safe_exit_int);
 	signal(SIGUSR1,signal_safe_exit);
-	time(&t1),t2=t1;
+	time(&t->t1),t->t2=t->t1;
 
-	all_particle_energy_hash(t,&energy);
-	printf(">>>Running canonical simulation ["RED"%d"RESET"]\n",energy);
+	all_particle_energy_hash(t,&t->energy);
+	printf(">>>Running canonical simulation ["RED"%d"RESET"]\n",t->energy);
 
 	//alloc_graph(t);
 	
 	for(i=1;!safe_exit&&i<t->step;i++){
+
 		//SDL sindow and polling events
+		///////////////////////////////
+
 		SDL_PollEvent(&s->event);
 		switch(s->event.type){
 			case SDL_QUIT:
@@ -141,25 +203,31 @@ int run(header *t,mySDL *s){
 				}
 				break;
 		}
+
 		//Monte Carlo cycle
+		///////////////////
+		
 		for(ncycle=0;ncycle<t->nparticle;ncycle++){
 			//Translation and Rotation
 			c=rnd_compound(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
-				acc_move[mc_move(c,t,&energy)]++;	
+				acc_move[mc_move(c,t,&t->energy)]++;	
 			}
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
-				//acc_rotate[mc_rotate(c,t,&energy)]++;
-				acc_rotate[mc_rotate_restricted(c,t,&energy)]++;
+				acc_rotate[mc_rotate(c,t,&t->energy)]++;
+				//acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
 			}
 			//if(0.0000064>dsfmt_genrand_open_open(&dsfmt)){
 			//	mc_gc_restricted(t,&energy);
 			//}
 		}
-		// Grand canonical moves
+
+		//Grand canonical moves
+		///////////////////////
+		
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-				mc_gc_restricted(t,&energy);
-		//	mc_gc(t,&energy);
+				//mc_gc_restricted(t,&t->energy);
+				mc_gc(t,&t->energy);
 		}
 		/*if(0.5>dsfmt_genrand_open_open(&dsfmt)){
 			acc_volume_xy[mc_npt_xy(t,&energy)]++;
@@ -167,14 +235,12 @@ int run(header *t,mySDL *s){
 			//acc_shape[mc_uy(t,&energy)]++; //FIXME
 			acc_volume[mc_npt(t,&energy)]++;
 		}*/
+
+		//Print
+		///////
+		
 		if(!(i%(t->mod*t->pmod))){
-			time(&t2);
-			en=(double)energy/(double)t->nparticle;
-			uwrite(&en,sizeof(double),1,fen);
-			rho=(double)t->nparticle/(t->box[0]*t->box[1]);
-			uwrite(&rho,sizeof(double),1,frho);
-			vol=(t->box[0]*t->box[1]);
-			uwrite(&vol,sizeof(double),1,fvol);
+			write_files(t);
 			gfrac(acc,frac,6);
 
 			if(t->optimize){
@@ -183,16 +249,20 @@ int run(header *t,mySDL *s){
 			}
 
 			if(t->verbose){
-				print_npt_log(stdout,t,i,difftime(t2,t1),energy,frac);
+				time(&t->t2);
+				print_log(stdout,t,i,difftime(t->t2,t->t1),frac);
 
 				char s_name[1024];
 				sprintf(s_name,"%s_%d",t->name,count++);
 				//printf("%s\n",s_name);
 				save_png(s_name,s);
 			}
+
+			explore(t);
+
 			//Update screen
-			//s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-			//s->scale=s->box[4]/(s->box[4]+1.0);
+			///////////////
+			
 			s->scale=1.0/t->box[0];
 			s->n=t->nparticle;
 			s->uy=t->uy;
@@ -206,10 +276,14 @@ int run(header *t,mySDL *s){
 			mySDLdisplay(s);
 		}
 	}
+	write_files(t);
+
 	mySDLdisplay(s);
 	save_png(t->name,s);
+
+	close_files(t);
 	//find_all_cycles(t);
-	close_file(fen);
-	checksum(stdout,t,energy);
+	checksum(stdout,t,t->energy);
+
 	return 0;
 }
