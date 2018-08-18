@@ -12,7 +12,6 @@
 dsfmt_t dsfmt;
 
 int main(int argc, char *argv[]){
-	int quit=0;
 	float color[4]={1.0,0.0,0.0,0.333};
 
 	//Initialize header
@@ -85,9 +84,5 @@ int main(int argc, char *argv[]){
 	}*/
 	SDL_Quit();
 
-	//Save last
-	///////////
-	
-	save_configuration(t->name,t);
 	return 0;
 }

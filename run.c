@@ -280,6 +280,7 @@ int run(header *t,mySDL *s){
 
 	mySDLdisplay(s);
 	save_png(t->name,s);
+	save_configuration(t->name,t);
 
 	close_files(t);
 	//find_all_cycles(t);
