@@ -12,6 +12,9 @@
 dsfmt_t dsfmt;
 
 int main(int argc, char *argv[]){
+	//main
+	//////
+	
 	float color[4]={1.0,0.0,0.0,0.333};
 
 	//Initialize header
@@ -39,29 +42,35 @@ int main(int argc, char *argv[]){
 	//Graphics
 	//////////
 	
-	mySDL *s=mySDLinit();
+	mySDL *s;
 
 	//Allocate memory blocks for the graphics
 	/////////////////////////////////////////
 	
-	s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
-	s->colors=alloc(sizeof(float)*4*t->nparticle_alloc);
-	s->n=t->nparticle;
-	s->uy=t->uy;
-	m128d2float(t->p->q,s->positions,s->n);
-	mySDLsetcolor(s->colors,color,s->n);
+	if(t->display){
 
-	//Define boundary
-	/////////////////
-	
-	s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-	s->scale=1.0/t->box[0];
-	
-	mySDLresize(s);
-	mySDLpositions(s,s->positions,s->n);
-	mySDLcolors(s,s->colors,s->n);
-	mySDLboundary(s,s->box);
-	mySDLdisplay(s);
+		s=mySDLinit();
+		
+		s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
+		s->colors=alloc(sizeof(float)*4*t->nparticle_alloc);
+		s->n=t->nparticle;
+		s->uy=t->uy;
+		m128d2float(t->p->q,s->positions,s->n);
+		mySDLsetcolor(s->colors,color,s->n);
+
+		//Define boundary
+		/////////////////
+		
+		s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
+		s->scale=1.0/t->box[0];
+		
+		mySDLresize(s);
+		mySDLpositions(s,s->positions,s->n);
+		mySDLcolors(s,s->colors,s->n);
+		mySDLboundary(s,s->box);
+		mySDLdisplay(s);
+
+	}
 
 	//Run the simulation
 	////////////////////
@@ -82,7 +91,10 @@ int main(int argc, char *argv[]){
 				break;
 		}
 	}*/
-	SDL_Quit();
+
+	if(t->display){
+		SDL_Quit();
+	}
 
 	return 0;
 }

@@ -14,7 +14,6 @@
 #include "patches.h"
 #include "alloc.h"
 extern dsfmt_t dsfmt;
-//void construct_particle(compound_particle *c,header *t){
 void construct_particle(compound_particle *c){
 	int i;
 	species *specie=c->specie;
@@ -149,16 +148,20 @@ int save_configuration(char *file,header *t){
 	unsigned int i;
 	FILE *fconf=open_file2(file,".conf","w");
 	species *s;
-	particle *p;
+	//particle *p;
+	compound_particle *c;
 	rev_list(&t->specie);
 	stamp_configuration(fconf,&t->init_time,t->steps_passed);
 	dump_args(fconf,t->argz);
 	rev_list(&t->specie);
 	s=t->specie;
 	while(s){
-		for(i=0;i<s->nparticle;i++){
-			p=s->p+i;
-			fprintf(fconf,"%.12lf %.12lf %.12lf %.12lf\n",(*(p)->q)[0],(*(p)->q)[1],(*(p)->or)[0],(*(p)->or)[1]);
+		//for(i=0;i<s->nparticle;i++){
+		for(i=0;i<s->ncompound;i++){
+			//p=s->p+i;
+			c=s->c+i;
+			//fprintf(fconf,"%.12lf %.12lf %.12lf %.12lf\n",(*(p)->q)[0],(*(p)->q)[1],(*(p)->or)[0],(*(p)->or)[1]);
+			fprintf(fconf,"%.12lf %.12lf %.12lf %.12lf\n",(*(c)->q)[0],(*(c)->q)[1],(*(c)->or)[0],(*(c)->or)[1]);
 		}
 		s=s->next;
 	}
@@ -192,6 +195,23 @@ int read_cline(FILE *f,particle *p,header *t){
 	}
 	return 0;
 }
+int read_ccline(FILE *f,compound_particle *c,header *t){
+	int d __attribute__ ((unused));
+	double *q=(double*)c->q;
+	double *or=(double*)c->or;
+	d=fscanf(f,"%lf %lf %lf %lf\n",q,q+1,or,or+1);
+	*(c)->q=*c->q;
+	*(c)->or=normalize(*c->or);
+	//*(p)->q_track=*(p)->q;
+	//*(p)->q_well=*(p)->q;
+	//*(p)->or_well=*(p)->or;
+	pre_set_particle(c,t);
+	//if(compound_overlap(c,t)){
+	//	error("Failed to read a particle position: Overlap[%lf %lf]",*q,*(q+1));
+	//}
+	set_particle(c,t);
+	return 0;
+}
 int load_configuration(char *file,header *t){
 	char c;
 	unsigned i;
@@ -223,7 +243,8 @@ int load_configuration_file(FILE *f,header *t){
 	int n;
 	long int off;
 	species *s=t->specie;
-	particle *q;
+	//particle *q;
+	compound_particle *cc;
 	rewind(f);
 	skip_alpha(f);
 	off=ftell(f);
@@ -233,9 +254,11 @@ int load_configuration_file(FILE *f,header *t){
 	fseek(f,off,SEEK_SET);
 	while(s){
 		for(i=0;i<s->N;i++){
-			q=s->p+i;
-			read_cline(f,q,t);
-			set_patches(q);
+		//for(i=0;i<s->ncompound;i++){
+			cc=(compound_particle*)(s->c+i);
+			//q=s->p+i;
+			read_ccline(f,cc,t);
+			//set_patches(q);
 		}
 		s=s->next;
 	}
@@ -332,6 +355,9 @@ int read_input(int argc,char *argv[],input_files *input,header *t){
 	FILE *f;
 	__m128d box;
 	print_input_configurational_files(stdout,input);
+	//no input files
+	////////////////
+	
 	if(!input->n){
 
 		printf(">>>Read command line arguments\n");
@@ -352,6 +378,9 @@ int read_input(int argc,char *argv[],input_files *input,header *t){
 		}
 		copy_configuration(t,box);
 	}
+	//reading input files
+	/////////////////////
+	
 	else{
 		f=open_file(*input->file,"r");
 
@@ -372,4 +401,3 @@ int read_input(int argc,char *argv[],input_files *input,header *t){
 	t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 	return 0;
 }
-

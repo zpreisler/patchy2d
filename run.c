@@ -67,6 +67,7 @@ void print_log(FILE *f,header *t,long long int i,double time,double frac[4]){
 	double rho=(double)t->nparticle/vol;
 	fprintf(f,UGREEN"LOG\n"RESET
 			CYAN"epsilon:"BLUE" %.3f "RESET
+			CYAN"pressure:"BLUE" %.3f "RESET
 			CYAN"mu:"BLUE" %.3f\n"RESET
 			CYAN"step:"BLUE" %Ld "RESET
 			CYAN"time:"BLUE" %.0lfs "RESET
@@ -86,7 +87,7 @@ void print_log(FILE *f,header *t,long long int i,double time,double frac[4]){
 			BLACK"rotation:"PURPLE" %.2lf "RESET
 			BLACK"volume:"PURPLE" %.2lf "RESET
 			BLACK"shape:"PURPLE" %.2lf \n"RESET,
-			t->epsilon,t->specie->mu,
+			t->epsilon,t->pressure,t->specie->mu,
 			i,time,t->mod,t->pmod,
 			t->energy,(double)t->energy/t->nparticle,rho,t->uy,
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
@@ -136,11 +137,29 @@ void write_files(header *t){
 	uwrite(&vol,sizeof(double),1,t->file.fvol);
 	uwrite(&n,sizeof(double),1,t->file.fn);
 }
+
 void explore(header *t){
+	//Explore parameter space
+	/////////////////////////
+	
 	double rnd;
-	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
+	//epsilon
+	/////////
+	
+	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*0.1;
 	t->epsilon+=rnd;
 	if(t->epsilon<0.0)t->epsilon*=-1;
+
+	//pressure
+	/////////
+	
+	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*0.1;
+	t->pressure+=rnd;
+	if(t->pressure<0.0)t->pressure*=-1;
+
+	//chmical potential
+	///////////////////
+	
 	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
 	t->specie->mu+=rnd;
 }
@@ -192,16 +211,18 @@ int run(header *t,mySDL *s){
 		//SDL sindow and polling events
 		///////////////////////////////
 
-		SDL_PollEvent(&s->event);
-		switch(s->event.type){
-			case SDL_QUIT:
-				safe_exit=1;
-				break;
-			case SDL_WINDOWEVENT:
-				if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
-					mySDLresize(s);
-				}
-				break;
+		if(t->display){
+			SDL_PollEvent(&s->event);
+			switch(s->event.type){
+				case SDL_QUIT:
+					safe_exit=1;
+					break;
+				case SDL_WINDOWEVENT:
+					if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
+						mySDLresize(s);
+					}
+					break;
+			}
 		}
 
 		//Monte Carlo cycle
@@ -225,16 +246,16 @@ int run(header *t,mySDL *s){
 		//Grand canonical moves
 		///////////////////////
 		
-		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
 				//mc_gc_restricted(t,&t->energy);
-				mc_gc(t,&t->energy);
-		}
-		/*if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-			acc_volume_xy[mc_npt_xy(t,&energy)]++;
-			acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
+		//		mc_gc(t,&t->energy);
+		//}
+		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+			//acc_volume_xy[mc_npt_xy(t,&t->energy)]++;
+			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
 			//acc_shape[mc_uy(t,&energy)]++; //FIXME
-			acc_volume[mc_npt(t,&energy)]++;
-		}*/
+			acc_volume[mc_npt(t,&t->energy)]++;
+		}
 
 		//Print
 		///////
@@ -255,32 +276,42 @@ int run(header *t,mySDL *s){
 				char s_name[1024];
 				sprintf(s_name,"%s_%d",t->name,count++);
 				//printf("%s\n",s_name);
-				save_png(s_name,s);
+				//save_png(s_name,s);
 			}
 
-			explore(t);
+			//explore
+			/////////
+
+			if(t->explore){
+				explore(t);
+			}
 
 			//Update screen
 			///////////////
 			
-			s->scale=1.0/t->box[0];
-			s->n=t->nparticle;
-			s->uy=t->uy;
-			m128d2float(t->p->q,s->positions,s->n);
-			float color[4]={1.0,0.0,0.0,0.333};
-			mySDLsetcolor(s->colors,color,s->n);
-			mySDLpositions(s,s->positions,s->n);
-			mySDLcolors(s,s->colors,s->n);
-			//mySDLboundary(s,s->box);
-			mySDLresize(s);
-			mySDLdisplay(s);
+			if(t->display){
+				
+				s->scale=1.0/t->box[0];
+				s->n=t->nparticle;
+				s->uy=t->uy;
+				m128d2float(t->p->q,s->positions,s->n);
+				float color[4]={1.0,0.0,0.0,0.333};
+				mySDLsetcolor(s->colors,color,s->n);
+				mySDLpositions(s,s->positions,s->n);
+				mySDLcolors(s,s->colors,s->n);
+				//mySDLboundary(s,s->box);
+				mySDLresize(s);
+				mySDLdisplay(s);
+			}
 		}
 	}
 	write_files(t);
-
-	mySDLdisplay(s);
-	save_png(t->name,s);
 	save_configuration(t->name,t);
+
+	if(t->display){
+		mySDLdisplay(s);
+		save_png(t->name,s);
+	}
 
 	close_files(t);
 	//find_all_cycles(t);

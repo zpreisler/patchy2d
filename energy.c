@@ -21,8 +21,9 @@ int overlap(particle *p,header *t){
 					rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
 					r2=length2(rij);
 					d2=SQR((p->sigma+q->sigma)*0.5);
+					//check -*- hard sphere overlap -*-
+					///////////////////////////////////
 					if(r2<d2){
-						//Overlap
 						return 1;
 					}
 					p->nd_r2[p->nd]=r2;

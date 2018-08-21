@@ -44,6 +44,8 @@ header *init_header(void){
 	t->optimize=1;
 	t->snapshot=1;
 	t->verbose=1;
+	t->display=1;
+	t->explore=0;
 	//Random seed
 	t->seed=1313;
 	//assigning arguments

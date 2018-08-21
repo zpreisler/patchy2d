@@ -482,6 +482,8 @@ void set_args(header *t){
 		{.short_opt='o',.long_opt="optimize",.key="optimize:",.value=&(t->optimize),.flag=ARG_INT,.help="Step size optimization on/off"},
 		{.short_opt='v',.long_opt="verbose",.key="verbose:",.value=&(t->verbose),.flag=ARG_INT,.help="Verbose mode on/off"},
 		{.long_opt="snapshot",.key="snapshot:",.value=&(t->snapshot),.flag=ARG_INT,.help="Snapshot mode on/off"},
+		{.long_opt="display",.key="display:",.value=&(t->display),.flag=ARG_INT,.help="Draw display on/off"},
+		{.long_opt="explore",.key="explore:",.value=&(t->display),.flag=ARG_INT,.help="Explore on/off"},
 		{.long_opt="seed",.key="seed:",.value=&(t->seed),.flag=ARG_INT,.help="Seed"}
 	};
 	nargs=(sizeof(args)/sizeof(arg));

@@ -189,6 +189,8 @@ typedef struct header{
 	int optimize;
 	int snapshot;
 	int verbose;
+	int display;
+	int explore;
 	//Max displacments
 	//////////////////
 	__m128d max_displacement;
