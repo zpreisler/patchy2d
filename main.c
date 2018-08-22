@@ -92,9 +92,9 @@ int main(int argc, char *argv[]){
 		}
 	}*/
 
-	if(t->display){
-		SDL_Quit();
-	}
+	//if(t->display){
+	//	SDL_Quit();
+	//}
 
 	return 0;
 }

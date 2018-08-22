@@ -275,8 +275,10 @@ int run(header *t,mySDL *s){
 
 				char s_name[1024];
 				sprintf(s_name,"%s_%d",t->name,count++);
-				//printf("%s\n",s_name);
-				//save_png(s_name,s);
+				printf("%s\n",s_name);
+				if(t->display){
+					save_png(s_name,s);
+				}
 			}
 
 			//explore
@@ -295,8 +297,23 @@ int run(header *t,mySDL *s){
 				s->n=t->nparticle;
 				s->uy=t->uy;
 				m128d2float(t->p->q,s->positions,s->n);
-				float color[4]={1.0,0.0,0.0,0.333};
+				float color[4]={0.0,0.0,0.0,0.333};
 				mySDLsetcolor(s->colors,color,s->n);
+
+				for(unsigned int k=0;k<t->specie->ncompound;k++){
+					compound_particle *cc=t->specie->c+k;
+					double ox,oy;
+					ox=(*(cc)->or)[0];
+					oy=(*(cc)->or)[1];
+					double a=(atan2(ox,oy));
+					//printf("[%lf %lf] %lf %lf %lf\n",ox,oy,a,sin(a)*sin(a),cos(a)*cos(a));
+					for(int ii=0;ii<cc->nparticle;ii++){
+						*(s->colors+ii*4+k*cc->nparticle*4+0)=cos(a+M_PI/3.0)*cos(a+M_PI/3.0)*0.99;
+						*(s->colors+ii*4+k*cc->nparticle*4+1)=cos(a+2.0*M_PI/3.0)*cos(a+2.0*M_PI/3.0)*0.66;
+						*(s->colors+ii*4+k*cc->nparticle*4+2)=cos(a)*cos(a)*0.77;
+					}
+				}
+
 				mySDLpositions(s,s->positions,s->n);
 				mySDLcolors(s,s->colors,s->n);
 				//mySDLboundary(s,s->box);
@@ -311,6 +328,7 @@ int run(header *t,mySDL *s){
 	if(t->display){
 		mySDLdisplay(s);
 		save_png(t->name,s);
+		SDL_Quit();
 	}
 
 	close_files(t);
