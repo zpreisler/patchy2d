@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
 	//Graphics
 	//////////
 	
-	mySDL *s;
+	mySDL *s=NULL;
 
 	//Allocate memory blocks for the graphics
 	/////////////////////////////////////////

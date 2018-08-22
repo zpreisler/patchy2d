@@ -264,6 +264,7 @@ int load_configuration_file(FILE *f,header *t){
 	}
 	return 0;
 }
+/*
 void copy_particle(particle *p,particle *q,header *t,__m128d box_copy,__m128d box){
 	*q->q=*p->q+box_copy*box;
 	*q->or=*p->or;
@@ -303,6 +304,49 @@ void copy_configuration(header *t,__m128d box){
 	}
 	t->copy=_mm_set1_pd(1.0);
 }
+*/
+void copy_compound_particle(compound_particle *c,compound_particle *d,header *t,__m128d box_copy,__m128d box){
+	*d->q=*c->q+box_copy*box;
+	*d->or=*c->or;
+	//set_patches(q);
+	//hash_insert(q,t->h1,t->table);
+	pre_set_particle(d,t);
+	set_particle(d,t);
+}
+void copy_configuration(header *t,__m128d box){
+	species *s=t->specie;
+	unsigned i;
+	int x,y;
+	int n;
+	__m128d box_copy={0.0,0.0};
+	compound_particle *c,*d;
+	while(s){
+		n=s->N;
+		for(x=1;x<t->copy[0];x++){
+			box_copy[0]=(double)x;
+			box_copy[1]=0.0;
+			for(i=0;i<s->N;i++){
+				c=s->c+i;
+				d=s->c+n++;
+				copy_compound_particle(c,d,t,box_copy,box);
+			}
+		}
+		s->N=n;
+		for(y=1;y<t->copy[1];y++){
+			box_copy[0]=0.0;
+			box_copy[1]=(double)y;
+			for(i=0;i<s->N;i++){
+				c=s->c+i;
+				d=s->c+n++;
+				copy_compound_particle(c,d,t,box_copy,box);
+			}
+		}
+		s->N=n;
+		s=s->next;
+	}
+	t->copy=_mm_set1_pd(1.0);
+}
+
 int init_configuration(char *file,header *t){
 	FILE *f;
 	if(!(f=open_file(file,"r"))){
