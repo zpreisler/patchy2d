@@ -159,6 +159,8 @@ typedef struct cluster{
 typedef struct cluster_list{
 	int n; //number of stored compounds
 	int ncluster; //number of clusters
+	double avg_size; //average cluster size
+	double max_size; //max cluster size
 	compound_particle **c; //store compound particles
 	cluster *clusters;
 }cluster_list;
@@ -172,6 +174,9 @@ typedef struct files{
 	FILE *fn; //number of particles 
 	FILE *ftime; //passed time
 	FILE *fstep; //passed MC steps
+	FILE *fncluster; //number of clusters
+	FILE *fcluster_avg_size; //average cluster size
+	FILE *fcluster_max_size; //max cluster size
 }files;
 typedef struct header{
 	char name[NAME_LENGTH];

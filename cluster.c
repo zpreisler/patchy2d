@@ -109,6 +109,7 @@ int find_all_clusters(header *t){
 			find_new_cluster(c,t);
 		}
 	}
+	avg_max_cluster_size(t);
 	return 0;
 }
 int print_clusters(header *t){
@@ -148,12 +149,24 @@ void color_cluster(cluster *cc,float *color){
 		color_compound_particle(c,color);
 	}
 }
+void avg_max_cluster_size(header *t){
+	int i;
+	int all=0;
+	t->cluster->max_size=1;
+	cluster *cc;
+	for(i=0;i<t->cluster->ncluster;i++){
+		cc=t->cluster->clusters+i;
+		all+=cc->n;
+		if(cc->n>t->cluster->max_size)t->cluster->max_size=cc->n;
+	}
+	t->cluster->avg_size=(double)all/(double)t->cluster->ncluster;
+}
 void color_all_clusters(header *t){
 	int i;
 	float color[4]={0.5,0.5,0.5,0.3};
 	cluster *cc;
 	float col;
-	printf("number of clusters [%d]\n",t->cluster->ncluster);
+	//printf("number of clusters [%d]\n",t->cluster->ncluster);
 	for(i=0;i<t->cluster->ncluster;i++){
 		cc=t->cluster->clusters+i;
 		col=((float)i/(float)(t->cluster->ncluster-1));

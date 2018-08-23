@@ -78,6 +78,7 @@ void print_log(FILE *f,header *t,long long int i,double time,double frac[4]){
 			YELLOW"U/N:"URED" %.3lf "RESET
 			YELLOW"rho:"UGREEN" %.3lf "RESET
 			YELLOW"uy:"UBLUE" %.3lf \n"RESET
+			GREEN"N compounds:"BLUE" %d\n"RESET
 			UBLUE"parameters\n"RESET
 			BLACK"displacement:"GREEN" %.4lf "RESET
 			BLACK"rotation:"GREEN" %.4lf "RESET
@@ -91,6 +92,7 @@ void print_log(FILE *f,header *t,long long int i,double time,double frac[4]){
 			t->epsilon,t->pressure,t->specie->mu,
 			i,time,t->mod,t->pmod,
 			t->energy,(double)t->energy/t->nparticle,rho,t->uy,
+			t->ncompound,
 			t->max_displacement[0],t->max_rotation,t->max_vol,t->max_uy,
 			frac[0],frac[1],frac[2],frac[3]);
 }
@@ -104,6 +106,9 @@ void open_files(header *t){
 	t->file.fn=open_file2(t->name,".n","w");
 	t->file.ftime=open_file2(t->name,".time","w");
 	t->file.fstep=open_file2(t->name,".step","w");
+	t->file.fncluster=open_file2(t->name,".ncluster","w");
+	t->file.fcluster_avg_size=open_file2(t->name,".cluster_avg_size","w");
+	t->file.fcluster_max_size=open_file2(t->name,".cluster_max_size","w");
 }
 void close_files(header *t){
 	close_file(t->file.fepsilon);
@@ -115,6 +120,23 @@ void close_files(header *t){
 	close_file(t->file.fn);
 	close_file(t->file.ftime);
 	close_file(t->file.fstep);
+	close_file(t->file.fncluster);
+	close_file(t->file.fcluster_avg_size);
+	close_file(t->file.fcluster_max_size);
+}
+void flush_files(header *t){
+	fflush(t->file.fepsilon);
+	fflush(t->file.fmu);
+	fflush(t->file.fpressure);
+	fflush(t->file.fen);
+	fflush(t->file.frho);
+	fflush(t->file.fvol);
+	fflush(t->file.fn);
+	fflush(t->file.ftime);
+	fflush(t->file.fstep);
+	fflush(t->file.fncluster);
+	fflush(t->file.fcluster_avg_size);
+	fflush(t->file.fcluster_max_size);
 }
 void write_files(header *t){
 	double en;
@@ -136,9 +158,14 @@ void write_files(header *t){
 	uwrite(&en,sizeof(double),1,t->file.fen);
 	uwrite(&rho,sizeof(double),1,t->file.frho);
 	uwrite(&vol,sizeof(double),1,t->file.fvol);
-	uwrite(&n,sizeof(double),1,t->file.fn);
-}
 
+	//Write cluster data
+	////////////////////
+	n=t->cluster->ncluster;
+	uwrite(&n,sizeof(double),1,t->file.fncluster);
+	uwrite(&t->cluster->avg_size,sizeof(double),1,t->file.fcluster_avg_size);
+	uwrite(&t->cluster->max_size,sizeof(double),1,t->file.fcluster_max_size);
+}
 void explore(header *t){
 	//Explore parameter space
 	/////////////////////////
@@ -241,7 +268,7 @@ int run(header *t,mySDL *s){
 				//acc_rotate[mc_rotate(c,t,&t->energy)]++;
 				acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
 			}
-			if(0.01>dsfmt_genrand_open_open(&dsfmt)){
+			if(0.001>dsfmt_genrand_open_open(&dsfmt)){
 				mc_gc_restricted(t,&t->energy);
 			}
 		}
@@ -265,6 +292,7 @@ int run(header *t,mySDL *s){
 		
 		if(!(i%(t->mod*t->pmod))){
 			write_files(t);
+			flush_files(t);
 			gfrac(acc,frac,6);
 
 			if(t->optimize){
@@ -324,6 +352,7 @@ int run(header *t,mySDL *s){
 				//find_new_cluster(t->specie->c,t);
 				//print_clusters(t);
 				find_all_clusters(t);
+				printf("ncluster [%d] max_cluster [%.0lf] avg_cluster [%.2lf]\n",t->cluster->ncluster,t->cluster->max_size,t->cluster->avg_size);
 
 				set_all_particle_color(t);
 				color_all_clusters(t);
