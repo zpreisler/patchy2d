@@ -3,10 +3,12 @@
 #include <immintrin.h>
 #include <math.h>
 #include <utils.h>
+#include "dSFMT.h"
 #include "zargs.h"
 #include "hash.h"
 #include "mm_math.h"
 #include "cluster.h"
+extern dsfmt_t dsfmt;
 int new_cluster(compound_particle *c,header *t){
 	int i=t->cluster->n++;
 	int j=t->cluster->ncluster++;	
@@ -41,7 +43,7 @@ int cluster_check_particle(particle *p,header *t){
 	int k;
 	__m128d rij;
 	double r2,d2;
-	double dd;
+	double dd,w=cos(15.0/180.0*M_PI);
 	particle *q;
 	compound_particle *c,*d;
 	h=hash(*p->q,t->h1);
@@ -56,7 +58,7 @@ int cluster_check_particle(particle *p,header *t){
 						////////////////////////////////////////////////
 						rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
 						r2=length2(rij);
-						d2=SQR(1.66); //FIXME 
+						d2=SQR((p->sigma_well+q->sigma_well)*0.5);
 						//check if the particle is within a specified radius
 						////////////////////////////////////////////////////
 						if(r2<d2){
@@ -64,7 +66,7 @@ int cluster_check_particle(particle *p,header *t){
 							//add cluster to the cluster list	
 							dd=dot(*c->or,*d->or);
 							//printf("%lf\n",dd);
-							if(fabs(dd)>cos(10.0/180.0*M_PI)){
+							if(fabs(dd)>w){
 								add2cluster(c,t);
 								find_cluster(c,t);
 							}
@@ -154,16 +156,29 @@ void color_all_clusters(header *t){
 	printf("number of clusters [%d]\n",t->cluster->ncluster);
 	for(i=0;i<t->cluster->ncluster;i++){
 		cc=t->cluster->clusters+i;
-		col=((float)i/(float)t->cluster->ncluster);
+		col=((float)i/(float)(t->cluster->ncluster-1));
 		//color[0]=cos(col)*cos(col);
-		color[0]=(col*2.0)-1.0;
+		//color[0]=(col*2.66)-1.66;
+		//color[1]=(col*2.66)-1.66;
+		//color[2]=(col*2.66)-1.66;
 		//color[1]=cos(col+M_PI/3.0)*cos(col+M_PI/3.0);
 		//color[2]=cos(col+2.0*M_PI/3)*cos(col+2.0*M_PI/3.0);
-		color[1]=1.0-fabs(col*2-1);
-		color[2]=(1.0-col)*2.0-1.0;
-		if(color[0]<0.0)color[0]=0.0;
-		if(color[2]<0.0)color[2]=0.0;
-		printf("color %.2lf %.2lf %.2lf\n",color[0],color[1],color[2]);
+		//color[1]=1.0-fabs(col*4-2.0);
+		//color[2]=(1.0-col)*2.66-1.66;
+
+		color[0]=dsfmt_genrand_open_open(&dsfmt);
+		color[1]=dsfmt_genrand_open_open(&dsfmt);
+		color[2]=dsfmt_genrand_open_open(&dsfmt);
+
+		col=color[0]+color[1]+color[2];
+		color[0]/=col;
+		color[1]/=col;
+		color[2]/=col;
+
+		//if(color[0]<0.0)color[0]=0.0;
+		//if(color[1]<0.0)color[1]=0.0;
+		//if(color[2]<0.0)color[2]=0.0;
+		//printf("color %.2lf %.2lf %.2lf\n",color[0],color[1],color[2]);
 		color_cluster(cc,color);
 	}
 }

@@ -2,7 +2,11 @@
 
 Simulation software to simulate patchy particles in 2d.
 
+### Patchy particles
 ![Snapshot](doc/b.png)
+
+### Rods
+![Snapshot](doc/rods.png)
 
 __Usage:__ patchy2d<br>
 [-n] [--name] {name:} Name<br>

@@ -238,26 +238,26 @@ int run(header *t,mySDL *s){
 				acc_move[mc_move(c,t,&t->energy)]++;	
 			}
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
-				acc_rotate[mc_rotate(c,t,&t->energy)]++;
-				//acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
+				//acc_rotate[mc_rotate(c,t,&t->energy)]++;
+				acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
 			}
-			//if(0.0000064>dsfmt_genrand_open_open(&dsfmt)){
-			//	mc_gc_restricted(t,&energy);
-			//}
+			if(0.01>dsfmt_genrand_open_open(&dsfmt)){
+				mc_gc_restricted(t,&t->energy);
+			}
 		}
 
 		//Grand canonical moves
 		///////////////////////
 		
-		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
+		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
 				//mc_gc_restricted(t,&t->energy);
 		//		mc_gc(t,&t->energy);
-		//}
+		}
 		if(0.5>dsfmt_genrand_open_open(&dsfmt)){
 			//acc_volume_xy[mc_npt_xy(t,&t->energy)]++;
 			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
 			//acc_shape[mc_uy(t,&energy)]++; //FIXME
-			acc_volume[mc_npt(t,&t->energy)]++;
+			//acc_volume[mc_npt(t,&t->energy)]++;
 		}
 
 		//Print
