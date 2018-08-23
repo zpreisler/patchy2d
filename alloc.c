@@ -15,25 +15,31 @@ void count_particles(header *t){
 	t->npatches=0; //number of patches
 	t->npatches_alloc=0; //number of patches allocated
 	//copy box multiplier
+	/////////////////////
 	cbox=t->copy[0]*t->copy[1];
 	//count over all specie (species are ordered in linked list)
+	////////////////////////////////////////////////////////////
 	while(s){
 		s->ncompound=s->N*cbox; //s->N is number of compounds
 		s->nparticle=s->ncompound*s->nppc; //number of particles is number of compounds x number of particles per compound
 		s->npatches=s->nparticle*s->npatch; //number of particle x number of patches per particle
 		//alloc
+		///////
 		s->ncompound_alloc=max(s->ncompound*M_ALLOC,MIN_ALLOC);
 		s->nparticle_alloc=s->ncompound_alloc*s->nppc;
 		s->npatches_alloc=s->nparticle_alloc*s->npatch;
 		//count
+		///////
 		t->ncompound+=s->ncompound;
 		t->nparticle+=s->nparticle;
 		t->npatches+=s->npatches;
 		//count alloc
+		/////////////
 		t->ncompound_alloc+=s->ncompound_alloc;
 		t->nparticle_alloc+=s->nparticle_alloc;
 		t->npatches_alloc+=s->npatches_alloc;
 		//move on	
+		/////////
 		s=s->next;
 	}
 }
@@ -69,6 +75,7 @@ void map_cmem(compound_particle *c,compound_memory *cmem,unsigned k){
 	c->or=cmem->or+k;
 	c->or_well=cmem->or_well+k;
 	//id
+	////
 	c->n=k;
 }
 void map_pmem(particle *p,particle_memory *pmem,unsigned k){
@@ -80,6 +87,7 @@ void map_pmem(particle *p,particle_memory *pmem,unsigned k){
 	p->or=pmem->or+k;
 	p->or_well=pmem->or_well+k;
 	//allocate lists
+	////////////////
 	p->new_list=(particle**)alloc(NLIST*sizeof(particle*));
 	p->old_list=(particle**)alloc(NLIST*sizeof(particle*));
 	p->nd_list=(particle**)alloc(NLIST*sizeof(particle*));
@@ -87,6 +95,7 @@ void map_pmem(particle *p,particle_memory *pmem,unsigned k){
 	p->nd_r2=(double*)alloc(NLIST*sizeof(double));
 	p->nd_rij=(__m128d*)alloc(NLIST*sizeof(__m128d));
 	//id
+	////
 	p->n=k;
 }
 void map_smem(patch *s,patch_memory *smem,unsigned k){
@@ -96,11 +105,13 @@ void map_smem(patch *s,patch_memory *smem,unsigned k){
 }
 void assign_particle(particle *p,species *s){
 	//patch
+	///////
 	p->sigma=s->sigma;
 	p->sigma_well=s->sigma_well;
 	p->npatch=s->npatch;
 	p->patch_width=cos(s->patch_width/180.0*M_PI);
 	//Graphs
+	////////
 	p->pass=0;
 	p->idx=-1;
 	p->npcycles=0;
@@ -118,14 +129,17 @@ particle *alloc_particles(header *t){
 	species *s=t->specie;
 	count_particles(t);
 	//Allocate memory for compounds particles and patches
+	/////////////////////////////////////////////////////
 	t->c=(compound_particle*)alloc(sizeof(compound_particle)*t->ncompound_alloc);
 	t->p=(particle*)alloc(sizeof(particle)*t->nparticle_alloc);
 	t->s=(patch*)alloc(sizeof(patch)*t->npatches_alloc);
 	//Allocate a memory blocks
+	//////////////////////////
 	compound_memory *cmem=alloc_cmem(t->ncompound_alloc);
 	particle_memory *pmem=alloc_pmem(t->nparticle_alloc);
 	patch_memory *smem=alloc_smem(t->npatches_alloc);
 	//Map the memory
+	////////////////
 	for(i=0;i<t->ncompound_alloc;i++){
 		map_cmem(t->c+i,cmem,i);
 	}
@@ -135,6 +149,13 @@ particle *alloc_particles(header *t){
 	for(i=0;i<t->npatches_alloc;i++){
 		map_smem(t->s+i,smem,i);
 	}
+	//Allocate cluster memory
+	/////////////////////////
+	t->cluster=alloc(sizeof(cluster_list));
+	t->cluster->c=(compound_particle**)alloc(sizeof(compound_particle*)*t->ncompound_alloc);
+	t->cluster->clusters=(cluster*)alloc(sizeof(cluster)*t->ncompound_alloc);
+	//Loop over all species
+	///////////////////////
 	j=0;
 	while(s){
 		s->flag=j++; //Flag different compounds
@@ -146,6 +167,7 @@ particle *alloc_particles(header *t){
 		kparticle+=s->nparticle_alloc;
 		kpatch+=s->npatches_alloc;
 		//Loop over compounds
+		/////////////////////
 		for(i=0;i<s->ncompound_alloc;i++){
 			c=s->c+i; //c -- current compound
 			c->specie=s;
@@ -157,14 +179,17 @@ particle *alloc_particles(header *t){
 			for(j=0;j<s->nppc;j++){
 				q=c->p+j; //q -- current particle
 				//linking
+				/////////
 				q->patch=s->s+count_patch;
 				q->c=c;
 				q->specie=s;
 				//flags
+				///////
 				q->type=type;
 				q->id=count_particle;
 				q->flag=s->flag;
 				//assing particle
+				/////////////////
 				assign_particle(q,s);
 				count_particle++;
 				for(k=0;k<s->npatch;k++){
@@ -179,6 +204,13 @@ particle *alloc_particles(header *t){
 		}
 		type++;
 		s=s->next;
+		//colors
+		////////
+		t->particle_colors=(float*)alloc(sizeof(float)*4*t->nparticle_alloc);
+		for(i=0;i<t->nparticle_alloc;i++){
+			q=t->p+i;
+			q->color=t->particle_colors+i*4;
+		}
 	}
 	return t->p;
 }

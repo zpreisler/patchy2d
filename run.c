@@ -22,6 +22,7 @@
 #include "grand_canonical.h"
 #include "npt.h"
 #include "restricted.h"
+#include "cluster.h"
 //Graphics
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -205,6 +206,8 @@ int run(header *t,mySDL *s){
 	printf(">>>Running canonical simulation ["RED"%d"RESET"]\n",t->energy);
 
 	//alloc_graph(t);
+
+	print_clusters(t);
 	
 	for(i=1;!safe_exit&&i<t->step;i++){
 
@@ -297,7 +300,8 @@ int run(header *t,mySDL *s){
 				s->n=t->nparticle;
 				s->uy=t->uy;
 				m128d2float(t->p->q,s->positions,s->n);
-				float color[4]={0.0,0.0,0.0,0.333};
+				float color[4]={0.0,1.0,0.0,0.333};
+				//float color2[4]={0.0,0.0,1.0,0.333};
 				mySDLsetcolor(s->colors,color,s->n);
 
 				for(unsigned int k=0;k<t->specie->ncompound;k++){
@@ -306,7 +310,6 @@ int run(header *t,mySDL *s){
 					ox=(*(cc)->or)[0];
 					oy=(*(cc)->or)[1];
 					double a=(atan2(ox,oy));
-					//printf("[%lf %lf] %lf %lf %lf\n",ox,oy,a,sin(a)*sin(a),cos(a)*cos(a));
 					for(int ii=0;ii<cc->nparticle;ii++){
 						*(s->colors+ii*4+k*cc->nparticle*4+0)=cos(a+M_PI/3.0)*cos(a+M_PI/3.0)*0.99;
 						*(s->colors+ii*4+k*cc->nparticle*4+1)=cos(a+2.0*M_PI/3.0)*cos(a+2.0*M_PI/3.0)*0.66;
@@ -316,12 +319,27 @@ int run(header *t,mySDL *s){
 
 				mySDLpositions(s,s->positions,s->n);
 				mySDLcolors(s,s->colors,s->n);
+
+				//clusters_reset(t);
+				//find_new_cluster(t->specie->c,t);
+				//print_clusters(t);
+				find_all_clusters(t);
+
+				set_all_particle_color(t);
+				color_all_clusters(t);
+
+				//color_cluster(t->cluster->clusters,color);
+
+				mySDLcolors(s,t->particle_colors,t->nparticle);
 				//mySDLboundary(s,s->box);
 				mySDLresize(s);
 				mySDLdisplay(s);
 			}
 		}
 	}
+	//clean up
+	//////////
+	
 	write_files(t);
 	save_configuration(t->name,t);
 

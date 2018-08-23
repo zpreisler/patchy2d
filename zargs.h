@@ -27,6 +27,7 @@ typedef struct arg_set{
 }arg_set;
 typedef struct patch{
 	//linking
+	/////////
 	void *p;
 	void *c;
 	void *specie;
@@ -37,11 +38,13 @@ typedef struct patch{
 	__m128d *q;	
 }patch;
 //structure for a particle with patches
+///////////////////////////////////////
 typedef struct particle{
 	patch *patch; //pointer to array of patches
 	void *c; //pointer to the compound
 	void *specie; //poiter to the beging of the array of the particles of the same specie
 	//Energy
+	////////
 	unsigned int en_new,en_old;	
 	unsigned nd; // number of cell neighbours
 	double *nd_r2;
@@ -56,31 +59,42 @@ typedef struct particle{
 	__m128d *qp_rij; //q-p orientational vector
 	double qp_r2; //save q-p r^2 distance
 	//for compounds
+	///////////////
 	__m128d *dq; //vector from the center of the compound
 	//Parameters
+	////////////
 	double sigma,sigma_well; //particle diameter and interaction range
 	//Patches
+	/////////
 	int npatch; // number of patches
 	double patch_width; // patch witdh (if patch width kept fixed)
-	//ID
+	//id
+	////
 	unsigned n; //ID
 	//HASH
+	//////
 	unsigned h;
 	//double *nd_d2;
 	struct particle **nd_list;
 	struct particle **new_list,**old_list;
 	struct particle *next,**prev;
 	//Flag
+	//////
 	int flag;
 	int type;
 	//Graphs
+	////////
 	int pass; // tags visited particles
 	int idx; // particle index
 	int id; //id
 	int npcycles; //number of pcycles -- for cycle analysis
 	void *pcycles; //pcycle -- pointer to the list of cycles
+	//Colors
+	////////
+	float *color;
 }particle;
 //structure for a compound particle
+///////////////////////////////////
 typedef struct compound_particle{
 	patch *s; //pointer to patches belonging to the compound
 	particle *p; //pointer to particles belonging to the compound
@@ -94,6 +108,7 @@ typedef struct compound_particle{
 	__m128d *q_well;
 	__m128d *or; //compound orientation;
 	__m128d *or_well;
+	void *cluster;
 }compound_particle;
 //hash table structure
 typedef struct hash_table{
@@ -106,6 +121,7 @@ typedef struct update{
 }update;
 typedef struct species{
 	//linking
+	/////////
 	patch *s; //pointer to patch array
 	particle *p; //pointer to particle array
 	compound_particle *c; //pointer to compound particle array
@@ -117,11 +133,12 @@ typedef struct species{
 	unsigned int nparticle,nparticle_alloc; //number of particles
 	unsigned int npatches,npatches_alloc; //number of all patches
 	//N -- read from input line or command line
+	///////////////////////////////////////////
 	unsigned int N;//,Nalloc; //number of particles, number of allocated particles
 	struct species *next;
 	int flag;
-	//
 	//particle specs (if the individual particles are not modified)
+	///////////////////////////////////////////////////////////////
 	double sigma; //particle diameter
 	double sigma_well; //particle diameter plus patch range
 	int npatch; //number of patches per particle
@@ -129,12 +146,22 @@ typedef struct species{
 	char patch_type[256];
 	double patch_angle;
 	double *angles;
-	//
 	//Simulation settings for the specie
+	////////////////////////////////////
 	int grand_canonical; //grand canonical switch
 	double mu; //chemical potential 
 	double *interaction_matrix;
 }species;
+typedef struct cluster{
+	compound_particle **p; //pointer to a pointer in cluster_list
+	int n; //number of compound particles in the cluster
+}cluster;
+typedef struct cluster_list{
+	int n; //number of stored compounds
+	int ncluster; //number of clusters
+	compound_particle **c; //store compound particles
+	cluster *clusters;
+}cluster_list;
 typedef struct files{
 	FILE *fepsilon; // inverse temperature
 	FILE *fmu;
@@ -158,6 +185,9 @@ typedef struct header{
 	compound_particle *c;
 	particle *p;
 	patch *s;
+	//Clusters
+	//////////
+	cluster_list *cluster;
 	int nspecies;
 	//HASH
 	//////
@@ -219,6 +249,9 @@ typedef struct header{
 	void *graph_pcycle;
 	time_t init_time;
 	long long int steps_passed;
+	//Colors
+	////////
+	float *particle_colors;
 }header;
 extern int command_line_args(int argc,char *argv[],arg_set argz);
 extern void dump_args(FILE *f,arg_set argz);
