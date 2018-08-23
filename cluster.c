@@ -56,7 +56,7 @@ int cluster_check_particle(particle *p,header *t){
 						////////////////////////////////////////////////
 						rij=_mm_dist_uy(*(p->q),*(q->q),t->box,t->uy);
 						r2=length2(rij);
-						d2=SQR(1.5); //FIXME 
+						d2=SQR(1.66); //FIXME 
 						//check if the particle is within a specified radius
 						////////////////////////////////////////////////////
 						if(r2<d2){
@@ -64,7 +64,7 @@ int cluster_check_particle(particle *p,header *t){
 							//add cluster to the cluster list	
 							dd=dot(*c->or,*d->or);
 							//printf("%lf\n",dd);
-							if(fabs(dd)>cos(5.0/180.0*M_PI)){
+							if(fabs(dd)>cos(10.0/180.0*M_PI)){
 								add2cluster(c,t);
 								find_cluster(c,t);
 							}
@@ -148,19 +148,22 @@ void color_cluster(cluster *cc,float *color){
 }
 void color_all_clusters(header *t){
 	int i;
-	float color[4]={0.5,0.5,0.5,0.5};
+	float color[4]={0.5,0.5,0.5,0.3};
 	cluster *cc;
 	float col;
 	printf("number of clusters [%d]\n",t->cluster->ncluster);
 	for(i=0;i<t->cluster->ncluster;i++){
 		cc=t->cluster->clusters+i;
-		col=((float)i/(float)t->cluster->ncluster*M_PI*0.5);
-		color[0]=cos(col)*cos(col);
-		color[1]=cos(col+M_PI/3.0)*cos(col+M_PI/3.0);
-		color[2]=cos(col+2.0*M_PI/3)*cos(col+2.0*M_PI/3.0);
-		//color[1]=1.0-fabs(col*2-1);
-		//color[2]=1.0-col;
-		//printf("color %.2lf %.2lf %.2lf\n",color[0],color[1],color[2]);
+		col=((float)i/(float)t->cluster->ncluster);
+		//color[0]=cos(col)*cos(col);
+		color[0]=(col*2.0)-1.0;
+		//color[1]=cos(col+M_PI/3.0)*cos(col+M_PI/3.0);
+		//color[2]=cos(col+2.0*M_PI/3)*cos(col+2.0*M_PI/3.0);
+		color[1]=1.0-fabs(col*2-1);
+		color[2]=(1.0-col)*2.0-1.0;
+		if(color[0]<0.0)color[0]=0.0;
+		if(color[2]<0.0)color[2]=0.0;
+		printf("color %.2lf %.2lf %.2lf\n",color[0],color[1],color[2]);
 		color_cluster(cc,color);
 	}
 }
