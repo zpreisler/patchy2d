@@ -14,9 +14,7 @@ dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
 	//main
 	//////
-	
 	float color[4]={1.0,0.0,0.0,0.333};
-
 	//Initialize header
 	///////////////////
 	
@@ -42,59 +40,40 @@ int main(int argc, char *argv[]){
 	//Graphics
 	//////////
 	
-	mySDL *s=NULL;
+	mySDL *sdl=NULL;
 
 	//Allocate memory blocks for the graphics
 	/////////////////////////////////////////
 	
 	if(t->display){
 
-		s=mySDLinit();
+		sdl=mySDLinit();
 		
-		s->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
-		s->colors=alloc(sizeof(float)*4*t->nparticle_alloc);
-		s->n=t->nparticle;
-		s->uy=t->uy;
-		m128d2float(t->p->q,s->positions,s->n);
-		mySDLsetcolor(s->colors,color,s->n);
+		sdl->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
+		sdl->colors=alloc(sizeof(float)*4*t->nparticle_alloc);
+		sdl->n=t->nparticle;
+		sdl->uy=t->uy;
+		m128d2float(t->p->q,sdl->positions,sdl->n);
+		mySDLsetcolor(sdl->colors,color,sdl->n);
 
 		//Define boundary
 		/////////////////
 		
-		s->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
-		s->scale=1.0/t->box[0];
+		sdl->box=(float[8]){0.0,0.0,t->box[0],0.0,t->box[0],t->box[1],0.0,t->box[1]};
+		sdl->scale=1.0/t->box[0];
 		
-		mySDLresize(s);
-		mySDLpositions(s,s->positions,s->n);
-		mySDLcolors(s,s->colors,s->n);
-		mySDLboundary(s,s->box);
-		mySDLdisplay(s);
+		mySDLresize(sdl);
+		mySDLpositions(sdl,sdl->positions,sdl->n);
+		mySDLcolors(sdl,sdl->colors,sdl->n);
+		mySDLboundary(sdl,sdl->box);
+		mySDLdisplay(sdl);
 
 	}
 
 	//Run the simulation
 	////////////////////
 
-	run(t,s);
+	run(t,sdl);
 	
-	/*while(!quit){
-		SDL_PollEvent(&s->event);
-		switch(s->event.type){
-			case SDL_QUIT:
-				quit=1;
-				break;
-			case SDL_WINDOWEVENT:
-				if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
-					mySDLresize(s);
-					mySDLdisplay(s);
-				}
-				break;
-		}
-	}*/
-
-	//if(t->display){
-	//	SDL_Quit();
-	//}
-
 	return 0;
 }

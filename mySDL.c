@@ -166,7 +166,6 @@ void mySDLsetcolor(float *b,float *color,int n){
 	}
 }
 void save_png(char *name,mySDL *s){
-//void save_png(char *name){
 	FILE *f=open_file2(name,".png","w");
 	mySLDbuffer(s);
 	png_structp png_ptr=png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);

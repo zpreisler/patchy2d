@@ -163,7 +163,9 @@ void write_files(header *t){
 	////////////////////
 	n=t->cluster->ncluster;
 	uwrite(&n,sizeof(double),1,t->file.fncluster);
-	uwrite(&t->cluster->avg_size,sizeof(double),1,t->file.fcluster_avg_size);
+	double x=(double)t->cluster->max_size/(double)t->ncompound;
+	//uwrite(&t->cluster->avg_size,sizeof(double),1,t->file.fcluster_avg_size);
+	uwrite(&x,sizeof(double),1,t->file.fcluster_avg_size);
 	uwrite(&t->cluster->max_size,sizeof(double),1,t->file.fcluster_max_size);
 }
 void explore(header *t){
@@ -191,7 +193,7 @@ void explore(header *t){
 	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
 	t->specie->mu+=rnd;
 }
-int run(header *t,mySDL *s){
+int run(header *t,mySDL *sdl){
 
 	//Main routine -- Running the simulation
 	////////////////////////////////////////
@@ -242,14 +244,14 @@ int run(header *t,mySDL *s){
 		///////////////////////////////
 
 		if(t->display){
-			SDL_PollEvent(&s->event);
-			switch(s->event.type){
+			SDL_PollEvent(&sdl->event);
+			switch(sdl->event.type){
 				case SDL_QUIT:
 					safe_exit=1;
 					break;
 				case SDL_WINDOWEVENT:
-					if(s->event.window.event==SDL_WINDOWEVENT_RESIZED){
-						mySDLresize(s);
+					if(sdl->event.window.event==SDL_WINDOWEVENT_RESIZED){
+						mySDLresize(sdl);
 					}
 					break;
 			}
@@ -291,6 +293,8 @@ int run(header *t,mySDL *s){
 		///////
 		
 		if(!(i%(t->mod*t->pmod))){
+			find_all_clusters(t);
+
 			write_files(t);
 			flush_files(t);
 			gfrac(acc,frac,6);
@@ -308,7 +312,7 @@ int run(header *t,mySDL *s){
 				sprintf(s_name,"%s_%d",t->name,count++);
 				printf("%s\n",s_name);
 				if(t->display){
-					save_png(s_name,s);
+					save_png(s_name,sdl);
 				}
 			}
 
@@ -324,13 +328,13 @@ int run(header *t,mySDL *s){
 			
 			if(t->display){
 				
-				s->scale=1.0/t->box[0];
-				s->n=t->nparticle;
-				s->uy=t->uy;
-				m128d2float(t->p->q,s->positions,s->n);
+				sdl->scale=1.0/t->box[0];
+				sdl->n=t->nparticle;
+				sdl->uy=t->uy;
+				m128d2float(t->p->q,sdl->positions,sdl->n);
 				float color[4]={0.0,1.0,0.0,0.333};
 				//float color2[4]={0.0,0.0,1.0,0.333};
-				mySDLsetcolor(s->colors,color,s->n);
+				mySDLsetcolor(sdl->colors,color,sdl->n);
 
 				for(unsigned int k=0;k<t->specie->ncompound;k++){
 					compound_particle *cc=t->specie->c+k;
@@ -339,19 +343,15 @@ int run(header *t,mySDL *s){
 					oy=(*(cc)->or)[1];
 					double a=(atan2(ox,oy));
 					for(int ii=0;ii<cc->nparticle;ii++){
-						*(s->colors+ii*4+k*cc->nparticle*4+0)=cos(a+M_PI/3.0)*cos(a+M_PI/3.0)*0.99;
-						*(s->colors+ii*4+k*cc->nparticle*4+1)=cos(a+2.0*M_PI/3.0)*cos(a+2.0*M_PI/3.0)*0.66;
-						*(s->colors+ii*4+k*cc->nparticle*4+2)=cos(a)*cos(a)*0.77;
+						*(sdl->colors+ii*4+k*cc->nparticle*4+0)=cos(a+M_PI/3.0)*cos(a+M_PI/3.0)*0.99;
+						*(sdl->colors+ii*4+k*cc->nparticle*4+1)=cos(a+2.0*M_PI/3.0)*cos(a+2.0*M_PI/3.0)*0.66;
+						*(sdl->colors+ii*4+k*cc->nparticle*4+2)=cos(a)*cos(a)*0.77;
 					}
 				}
 
-				mySDLpositions(s,s->positions,s->n);
-				mySDLcolors(s,s->colors,s->n);
+				mySDLpositions(sdl,sdl->positions,sdl->n);
+				mySDLcolors(sdl,sdl->colors,sdl->n);
 
-				//clusters_reset(t);
-				//find_new_cluster(t->specie->c,t);
-				//print_clusters(t);
-				find_all_clusters(t);
 				printf("ncluster [%d] max_cluster [%.0lf] avg_cluster [%.2lf]\n",t->cluster->ncluster,t->cluster->max_size,t->cluster->avg_size);
 
 				set_all_particle_color(t);
@@ -359,10 +359,10 @@ int run(header *t,mySDL *s){
 
 				//color_cluster(t->cluster->clusters,color);
 
-				mySDLcolors(s,t->particle_colors,t->nparticle);
+				mySDLcolors(sdl,t->particle_colors,t->nparticle);
 				//mySDLboundary(s,s->box);
-				mySDLresize(s);
-				mySDLdisplay(s);
+				mySDLresize(sdl);
+				mySDLdisplay(sdl);
 			}
 		}
 	}
@@ -373,8 +373,8 @@ int run(header *t,mySDL *s){
 	save_configuration(t->name,t);
 
 	if(t->display){
-		mySDLdisplay(s);
-		save_png(t->name,s);
+		mySDLdisplay(sdl);
+		save_png(t->name,sdl);
 		SDL_Quit();
 	}
 
