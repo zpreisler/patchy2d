@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <utils.h>
+#include "dSFMT.h"
+
+#if defined SDL
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
-#include <utils.h>
-#include "dSFMT.h"
 #include "program_gl.h"
 #include "mySDL.h"
+#endif
+
 #include "init.h"
 #include "run.h"
 dsfmt_t dsfmt;
@@ -14,7 +18,6 @@ dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
 	//main
 	//////
-	float color[4]={1.0,0.0,0.0,0.333};
 	//Initialize header
 	///////////////////
 	
@@ -37,10 +40,12 @@ int main(int argc, char *argv[]){
 	
 	dump_args(stdout,t->argz);
 
+#if defined SDL
 	//Graphics
 	//////////
 	
 	mySDL *sdl=NULL;
+	float color[4]={1.0,0.0,0.0,0.333};
 
 	//Allocate memory blocks for the graphics
 	/////////////////////////////////////////
@@ -74,6 +79,9 @@ int main(int argc, char *argv[]){
 	////////////////////
 
 	run(t,sdl);
+#else
+	run(t);
+#endif
 	
 	return 0;
 }

@@ -23,11 +23,15 @@
 #include "npt.h"
 #include "restricted.h"
 #include "cluster.h"
+
+#if defined SDL
 //Graphics
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
 #include "mySDL.h"
+#endif
+
 //#include "postscript.h"
 extern dsfmt_t dsfmt;
 static volatile sig_atomic_t safe_exit=0;
@@ -193,7 +197,11 @@ void explore(header *t){
 	rnd=(dsfmt_genrand_open_open(&dsfmt)-0.5)*1.0;
 	t->specie->mu+=rnd;
 }
+#if defined SDL
 int run(header *t,mySDL *sdl){
+#else
+int run(header *t){
+#endif
 
 	//Main routine -- Running the simulation
 	////////////////////////////////////////
@@ -240,6 +248,7 @@ int run(header *t,mySDL *sdl){
 	
 	for(i=1;!safe_exit&&i<t->step;i++){
 
+#if defined SDL
 		//SDL sindow and polling events
 		///////////////////////////////
 
@@ -256,6 +265,7 @@ int run(header *t,mySDL *sdl){
 					break;
 			}
 		}
+#endif
 
 		//Monte Carlo cycle
 		///////////////////
@@ -311,9 +321,12 @@ int run(header *t,mySDL *sdl){
 				char s_name[1024];
 				sprintf(s_name,"%s_%d",t->name,count++);
 				printf("%s\n",s_name);
+
+#if defined SDL
 				if(t->display){
 					save_png(s_name,sdl);
 				}
+#endif
 			}
 
 			//explore
@@ -322,6 +335,8 @@ int run(header *t,mySDL *sdl){
 			if(t->explore){
 				explore(t);
 			}
+
+#if defined SDL
 
 			//Update screen
 			///////////////
@@ -364,19 +379,24 @@ int run(header *t,mySDL *sdl){
 				mySDLresize(sdl);
 				mySDLdisplay(sdl);
 			}
+#endif
+
 		}
 	}
+
 	//clean up
 	//////////
-	
-	write_files(t);
-	save_configuration(t->name,t);
 
+#if defined SDL
 	if(t->display){
 		mySDLdisplay(sdl);
 		save_png(t->name,sdl);
 		SDL_Quit();
 	}
+#endif
+
+	write_files(t);
+	save_configuration(t->name,t);
 
 	close_files(t);
 	//find_all_cycles(t);
