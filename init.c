@@ -202,6 +202,7 @@ int read_ccline(FILE *f,compound_particle *c,header *t){
 	d=fscanf(f,"%lf %lf %lf %lf\n",q,q+1,or,or+1);
 	*(c)->q=*c->q;
 	*(c)->or=normalize(*c->or);
+	*(c)->or_well=(__m128d){1.0,0.0};
 	//*(p)->q_track=*(p)->q;
 	//*(p)->q_well=*(p)->q;
 	//*(p)->or_well=*(p)->or;
