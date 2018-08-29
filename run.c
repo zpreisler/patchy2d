@@ -270,7 +270,8 @@ int run(header *t){
 		//Monte Carlo cycle
 		///////////////////
 		
-		for(ncycle=0;ncycle<t->nparticle;ncycle++){
+		//for(ncycle=0;ncycle<t->nparticle;ncycle++){
+		for(ncycle=0;ncycle<500;ncycle++){
 			//Translation and Rotation
 			c=rnd_compound(t);
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
@@ -280,10 +281,11 @@ int run(header *t){
 				//acc_rotate[mc_rotate(c,t,&t->energy)]++;
 				acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
 			}
-			if(0.01>dsfmt_genrand_open_open(&dsfmt)){
-				mc_gc_restricted(t,&t->energy);
-			}
+			//if(0.01>dsfmt_genrand_open_open(&dsfmt)){
+			//	mc_gc_restricted(t,&t->energy);
+			//}
 		}
+		mc_gc_restricted(t,&t->energy);
 
 		//Grand canonical moves
 		///////////////////////
