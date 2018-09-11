@@ -226,6 +226,12 @@ typedef struct header{
 	int verbose;
 	int display;
 	int explore;
+	//Ensembles
+	///////////
+	int npt;
+	int nptxy;
+	int nptdxdy;
+	int shape;
 	//Max displacments
 	//////////////////
 	__m128d max_displacement;

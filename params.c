@@ -46,6 +46,12 @@ header *init_header(void){
 	t->verbose=1;
 	t->display=1;
 	t->explore=0;
+	//Ensembles
+	///////////
+	t->npt=0;
+	t->nptxy=0;
+	t->nptdxdy=0;
+	t->shape=0;
 	//Random seed
 	t->seed=1313;
 	//assigning arguments

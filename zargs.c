@@ -484,6 +484,10 @@ void set_args(header *t){
 		{.long_opt="snapshot",.key="snapshot:",.value=&(t->snapshot),.flag=ARG_INT,.help="Snapshot mode on/off"},
 		{.long_opt="display",.key="display:",.value=&(t->display),.flag=ARG_INT,.help="Draw display on/off"},
 		{.long_opt="explore",.key="explore:",.value=&(t->display),.flag=ARG_INT,.help="Explore on/off"},
+		{.long_opt="npt",.key="npt:",.value=&(t->npt),.flag=ARG_INT,.help="NPT on/off"},
+		{.long_opt="nptxy",.key="nptxy:",.value=&(t->nptxy),.flag=ARG_INT,.help="NPT xy on/off"},
+		{.long_opt="nptdxdy",.key="nptdxdy:",.value=&(t->nptdxdy),.flag=ARG_INT,.help="NPT dxdy on/off"},
+		{.long_opt="shape",.key="shape:",.value=&(t->shape),.flag=ARG_INT,.help="NPT shape on/off"},
 		{.long_opt="seed",.key="seed:",.value=&(t->seed),.flag=ARG_INT,.help="Seed"}
 	};
 	nargs=(sizeof(args)/sizeof(arg));

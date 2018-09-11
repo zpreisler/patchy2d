@@ -285,21 +285,29 @@ int run(header *t){
 			//	mc_gc_restricted(t,&t->energy);
 			//}
 		}
-		mc_gc_restricted(t,&t->energy);
 
 		//Grand canonical moves
 		///////////////////////
+		mc_gc_restricted(t,&t->energy);
 		
 		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-				//mc_gc_restricted(t,&t->energy);
 		//		mc_gc(t,&t->energy);
 		//}
-		//if(0.5>dsfmt_genrand_open_open(&dsfmt)){
-			//acc_volume_xy[mc_npt_xy(t,&t->energy)]++;
-			//acc_volume_dxdy[mc_npt_dxdy(t,&energy)]++;
-			//acc_shape[mc_uy(t,&energy)]++; //FIXME
-			//acc_volume[mc_npt(t,&t->energy)]++;
-		//}
+		
+		//NPT
+		/////
+		if(t->npt){
+			acc_volume[mc_npt(t,&t->energy)]++;
+		}
+		if(t->nptxy){
+			acc_volume_xy[mc_npt_xy(t,&t->energy)]++;
+		}
+		if(t->nptxy){
+			acc_volume_dxdy[mc_npt_dxdy(t,&t->energy)]++;
+		}
+		if(t->shape){
+			acc_shape[mc_uy(t,&t->energy)]++; //FIXME
+		}
 
 		//Print
 		///////
