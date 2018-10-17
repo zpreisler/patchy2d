@@ -84,7 +84,7 @@ int init_configuration_random(header *t){
 				*(c)->or_well=(__m128d){1.0,0.0};
 				pre_set_particle(c,t);
 				k++;
-				if(k>4096){
+				if(k>65536){
 					return 1;
 				}
 			}while(compound_overlap(c,t));

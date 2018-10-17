@@ -52,7 +52,7 @@ mySDL *mySDLinit(){
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,640,640,
 			//SDL_WINDOWPOS_UNDEFINED,128,128,
-			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE|SDL_WINDOW_ALLOW_HIGHDPI);
 	s->glcontext=SDL_GL_CreateContext(s->window);
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	s->glew_status=glewInit();
