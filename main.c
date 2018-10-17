@@ -68,10 +68,10 @@ int main(int argc, char *argv[]){
 		sdl->scale=1.0/t->box[0];
 		
 		mySDLresize(sdl);
-		mySDLpositions(sdl,sdl->positions,sdl->n);
-		mySDLcolors(sdl,sdl->colors,sdl->n);
-		mySDLboundary(sdl,sdl->box);
-		mySDLdisplay(sdl);
+		//mySDLpositions(sdl,sdl->positions,sdl->n);
+		//mySDLcolors(sdl,sdl->colors,sdl->n);
+		//mySDLboundary(sdl,sdl->box);
+		//mySDLdisplay(sdl);
 
 	}
 
