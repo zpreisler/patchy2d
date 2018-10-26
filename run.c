@@ -278,8 +278,8 @@ int run(header *t){
 				acc_move[mc_move(c,t,&t->energy)]++;	
 			}
 			if(0.5<dsfmt_genrand_open_open(&dsfmt)){
-				//acc_rotate[mc_rotate(c,t,&t->energy)]++;
-				acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
+				acc_rotate[mc_rotate(c,t,&t->energy)]++;
+				//acc_rotate[mc_rotate_restricted(c,t,&t->energy)]++;
 			}
 			//if(0.01>dsfmt_genrand_open_open(&dsfmt)){
 			//	mc_gc_restricted(t,&t->energy);
@@ -324,30 +324,7 @@ int run(header *t){
 				t->max_displacement=_mm_set1_pd(t->max_displacement[0]);
 			}
 
-			if(t->verbose){
-				time(&t->t2);
-				print_log(stdout,t,i,difftime(t->t2,t->t1),frac);
-
-				char s_name[1024];
-				sprintf(s_name,"%s_%d",t->name,count++);
-				//printf("%s\n",s_name);
-
 #if defined SDL
-				if(t->display){
-					save_png(s_name,sdl);
-				}
-#endif
-			}
-
-			//explore
-			/////////
-
-			if(t->explore){
-				explore(t);
-			}
-
-#if defined SDL
-
 			//Update screen
 			///////////////
 			
@@ -381,15 +358,33 @@ int run(header *t){
 
 				//set_all_particle_color(t);
 				//color_all_clusters(t);
-
 				//color_cluster(t->cluster->clusters,color);
-
 				//mySDLcolors(sdl,t->particle_colors,t->nparticle);
 				//mySDLboundary(s,s->box);
 				mySDLresize(sdl);
 				mySDLdisplay(sdl);
 			}
 #endif
+
+			if(t->verbose){
+				time(&t->t2);
+				print_log(stdout,t,i,difftime(t->t2,t->t1),frac);
+				char s_name[1024];
+				sprintf(s_name,"%s_%d",t->name,count++);
+				//printf("%s\n",s_name);
+#if defined SDL
+				if(t->display){
+					save_png(s_name,sdl);
+				}
+#endif
+			}
+
+			//explore
+			/////////
+
+			if(t->explore){
+				explore(t);
+			}
 
 		}
 	}
