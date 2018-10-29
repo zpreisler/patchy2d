@@ -1,6 +1,36 @@
 # Patchy 2d
 
+
 Simulation software to simulate patchy particles in 2d.
+
+### Prerequisites
+SDL, opengl
+
+### Installing
+
+First one needs to compile & install *lib*
+
+```
+git clone https://github.com/zpreisler/lib.git
+make
+make install
+```
+
+Get the source code
+
+```
+git clone https://github.com/zpreisler/patchy2d.git
+make
+make install
+```
+
+### Examples
+
+From the command line
+
+```
+patchy2d -n three_patch -N 64  -b 24 24
+```
 
 ### Patchy particles
 ![Snapshot](doc/b.png)
