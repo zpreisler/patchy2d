@@ -1,5 +1,5 @@
 # Patchy 2d
-
+![license](https://img.shields.io/badge/license-MIT-green.svg)
 
 Simulation software to simulate patchy particles in 2d.
 
