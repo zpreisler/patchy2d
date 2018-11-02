@@ -3,6 +3,11 @@
 
 Simulation software to simulate patchy particles in 2d.
 
+------
+
+This is a Monte Carlo code. Number of ensembles are supported: Canonical (*NVT*), Grand-Canonical (mu VT), isothermal–isobaric ensemble (*NpT*).
+The code is also able to simulate more complex particles such as rods composed by number of single discs.
+
 ### Prerequisites
 opengl, SDL
 
