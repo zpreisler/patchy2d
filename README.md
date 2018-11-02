@@ -4,7 +4,7 @@
 Simulation software to simulate patchy particles in 2d.
 
 ### Prerequisites
-SDL, opengl
+opengl, SDL
 
 ### Installing
 
