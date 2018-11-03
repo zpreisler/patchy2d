@@ -34,8 +34,9 @@ make install
 From the command line
 
 ```
-patchy2d -n three_patch -N 64  -b 24 24
+patchy2d  -n three_patch -s 10000000 -N 512 --npatch 3 --sigma_well 1.1 --patch_width 7 -g 0 -b 30 30 -e 7 --pmod 100 -m 1000
 ```
+The above will generate 512 3-patch particles with interaction range 0.1 and the patch width 7
 
 ### Patchy particles
 ![Snapshot](doc/b.png)
