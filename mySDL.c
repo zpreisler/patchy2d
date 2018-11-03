@@ -41,21 +41,23 @@ mySDL *mySDLinit(){
 	s->view_matrix=alloc(sizeof(float)*4);
 	s->box=alloc(sizeof(float)*8);
 	//Generate program
-	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
-	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,2);
-	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL,1);
+	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,24);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4);
 	SDL_Init(SDL_INIT_VIDEO);
-	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,2);
-	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,8);
 	//Define window
 	s->window=SDL_CreateWindow("SDL",
 			SDL_WINDOWPOS_UNDEFINED,
-			SDL_WINDOWPOS_UNDEFINED,640,640,
-			//SDL_WINDOWPOS_UNDEFINED,128,128,
-			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE|SDL_WINDOW_ALLOW_HIGHDPI);
+			SDL_WINDOWPOS_UNDEFINED,1000,1000,
+			SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 	s->glcontext=SDL_GL_CreateContext(s->window);
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	s->glew_status=glewInit();
+
+	int depth;
+	SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE,&depth);
+	printf("DEPTH_SIZE %d %d\n",depth);
+
 	//Create program -- load shaders
 	//s->program[0]=create_program("shader.vert","shader.geom","shader.frag");
 	//s->program[1]=create_program("boundry.vert","boundry.geom","boundry.frag");
@@ -69,12 +71,13 @@ mySDL *mySDLinit(){
 	//Generate buffers
 	glGenVertexArrays(2,s->vao); //Generate vertex arrays
 	glGenBuffers(3,s->vbo); //Generate buffer objects
-	//Enable transparency
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	//Multisample
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_MULTISAMPLE_ARB);
+	//glDisable(GL_DEPTH_TEST);
+	//Enable transparency
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	//Print graphics card info
 	glsl_info();
 	return s;
@@ -116,7 +119,7 @@ void mySDLdisplay(mySDL *s){
 	//glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 	//glDisable(GL_LINE_SMOOTH);
 	//glDisable(GL_POLYGON_SMOOTH);
-	//glEnable(GL_MULTISAMPLE);
+	glEnable(GL_MULTISAMPLE);
 	//Draw particles and the boundary
 	//Clear
 	glClearColor(1.0,1.0,1.0,1.0);
@@ -173,16 +176,16 @@ void save_png(char *name,mySDL *s){
 	png_info=png_create_info_struct(png_ptr);
 	setjmp(png_jmpbuf(png_ptr));
 	png_init_io(png_ptr,f);
-	png_set_IHDR(png_ptr,png_info,640,640,8,PNG_COLOR_TYPE_RGB,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,PNG_FILTER_TYPE_DEFAULT);
-	unsigned char data[3*640*640],argb[4*640*640];
-	unsigned char *rows[640];
+	png_set_IHDR(png_ptr,png_info,1000,1000,8,PNG_COLOR_TYPE_RGB,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,PNG_FILTER_TYPE_DEFAULT);
+	unsigned char data[3*1000*1000],argb[4*1000*1000];
+	unsigned char *rows[1000];
 	int i,j,i1,i2;
-	glReadPixels(0,0,640,640,GL_BGRA,GL_UNSIGNED_INT_8_8_8_8,argb);
-	for (i=0;i<640;++i){
-		rows[640-i-1]=data+(i*640*3);
-		for(j=0;j<640;++j){
-			i1=(i*640+j)*3;
-			i2=(i*640+j)*4;
+	glReadPixels(0,0,1000,1000,GL_BGRA,GL_UNSIGNED_INT_8_8_8_8,argb);
+	for (i=0;i<1000;++i){
+		rows[1000-i-1]=data+(i*1000*3);
+		for(j=0;j<1000;++j){
+			i1=(i*1000+j)*3;
+			i2=(i*1000+j)*4;
 			data[i1++]=argb[++i2];
 			data[i1++]=argb[++i2];
 			data[i1++]=argb[++i2];
