@@ -54,6 +54,7 @@ header *init_header(void){
 	t->shape=0;
 	//Random seed
 	t->seed=1313;
+	t->screen_geometry=(__m128d){640,640};
 	//assigning arguments
 	time(&t->init_time);
 	set_args(t);

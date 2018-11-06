@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 	
 	if(t->display){
 
-		sdl=mySDLinit();
+		sdl=mySDLinit((unsigned int)t->screen_geometry[0],(unsigned int)t->screen_geometry[1]);
 		
 		sdl->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
 		sdl->colors=alloc(sizeof(float)*4*t->nparticle_alloc);

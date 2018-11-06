@@ -226,6 +226,7 @@ typedef struct header{
 	int verbose;
 	int display;
 	int explore;
+	__m128d screen_geometry;
 	//Ensembles
 	///////////
 	int npt;

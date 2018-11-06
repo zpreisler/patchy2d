@@ -488,7 +488,8 @@ void set_args(header *t){
 		{.long_opt="nptxy",.key="nptxy:",.value=&(t->nptxy),.flag=ARG_INT,.help="NPT xy on/off"},
 		{.long_opt="nptdxdy",.key="nptdxdy:",.value=&(t->nptdxdy),.flag=ARG_INT,.help="NPT dxdy on/off"},
 		{.long_opt="shape",.key="shape:",.value=&(t->shape),.flag=ARG_INT,.help="NPT shape on/off"},
-		{.long_opt="seed",.key="seed:",.value=&(t->seed),.flag=ARG_INT,.help="Seed"}
+		{.long_opt="seed",.key="seed:",.value=&(t->seed),.flag=ARG_INT,.help="Seed"},
+		{.long_opt="screen_geometry",.key="screen_geometry:",.value=&(t->screen_geometry),.flag=ARG_LFVEC,.mask=2,.help="screen_geometry"}
 	};
 	nargs=(sizeof(args)/sizeof(arg));
 	t->argz.n=(sizeof(args)/sizeof(arg));
