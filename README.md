@@ -39,7 +39,7 @@ patchy2d  -n three_patch -s 10000000 -N 512 --npatch 3 --sigma_well 1.1 --patch_
 The above will generate 512 3-patch particles with interaction range 0.1 and the patch width 7
 
 ### Patchy particles
-![Snapshot](doc/b.png)
+![Snapshot](doc/three_patch.gif)
 
 ### Rods
 ![Snapshot](doc/rods.png)
