@@ -361,7 +361,7 @@ int run(header *t){
 				//color_cluster(t->cluster->clusters,color);
 				//mySDLcolors(sdl,t->particle_colors,t->nparticle);
 				//mySDLboundary(s,s->box);
-				mySDLresize(sdl);
+				//mySDLresize(sdl);
 				mySDLdisplay(sdl);
 			}
 #endif

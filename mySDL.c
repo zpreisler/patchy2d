@@ -72,8 +72,10 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	s->glew_status=glewInit();
 
 	//Create program -- load shaders
-	s->program[0]=create_program("/home/zdenek/Projects/patchy2d/shader.vert","/home/zdenek/Projects/patchy2d/shader.geom","/home/zdenek/Projects/patchy2d/shader.frag");
-	s->program[1]=create_program("/home/zdenek/Projects/patchy2d/boundry.vert","/home/zdenek/Projects/patchy2d/boundry.geom","/home/zdenek/Projects/patchy2d/boundry.frag");
+	s->program[0]=create_program("/home/zdenek/Projects/patchy2d/shader.vert",
+			"/home/zdenek/Projects/patchy2d/shader.geom","/home/zdenek/Projects/patchy2d/shader.frag");
+	s->program[1]=create_program("/home/zdenek/Projects/patchy2d/boundry.vert",
+			"/home/zdenek/Projects/patchy2d/boundry.geom","/home/zdenek/Projects/patchy2d/boundry.frag");
 	
 	//Assign uniforms
 	s->proj_matrix_loc=glGetUniformLocation(s->program[0],"proj_matrix");
@@ -98,6 +100,9 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	return s;
 }
 void mySDLpositions(mySDL *s,float *p,int n){
+	//put positions into graphics buffer
+	////////////////////////////////////
+
 	//write positions
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[0]); //Select buffer
@@ -110,6 +115,9 @@ void mySDLpositions(mySDL *s,float *p,int n){
 	return;
 }
 void mySDLcolors(mySDL *s,float *c,int n){
+	//put colors into graphics buffer
+	/////////////////////////////////
+
 	//write_colors
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[1]); //Select buffer
@@ -122,6 +130,7 @@ void mySDLcolors(mySDL *s,float *c,int n){
 	return;
 }
 void mySDLboundary(mySDL *s,float *b){
+
 	//write positions
 	glBindVertexArray(s->vao[1]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[3]); //Select buffer
@@ -134,20 +143,23 @@ void mySDLboundary(mySDL *s,float *b){
 	return;
 }
 void mySDLdisplay(mySDL *s){
+	//Display
+	/////////
 	
 	//Clear
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	//Draw
+	//Draw particles
+	////////////////
 	glUseProgram(s->program[0]);
 	glBindVertexArray(s->vao[0]);
 	glDrawArrays(GL_POINTS,0,s->n);
 
-	//Draw
+	//Draw boundry box
+	//////////////////
 	glUseProgram(s->program[1]);
 	glBindVertexArray(s->vao[1]);
-
 	//glLineWidth(20.0f);
 	glDrawArrays(GL_LINE_LOOP,0,4);
 
@@ -156,6 +168,8 @@ void mySDLdisplay(mySDL *s){
 	return;
 }
 void mySLDbuffer(mySDL *s){
+	//buffer
+	////////
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -190,6 +204,7 @@ void mySDLsetcolor(float *b,float *color,int n){
 void save_png(char *name,mySDL *s){
 	//Save png
 	//////////
+	//FIXME
 	FILE *f=open_file2(name,".png","w");
 	mySLDbuffer(s);
 	png_structp png_ptr=png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);

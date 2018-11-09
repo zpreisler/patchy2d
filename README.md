@@ -5,8 +5,10 @@ Simulation software to simulate patchy particles in 2d.
 
 ------
 
-This is a Monte Carlo code. Number of ensembles are supported: Canonical (*NVT*), Grand-Canonical (mu VT), isothermal–isobaric ensemble (*NpT*).
+This is a Monte Carlo code. Number of ensembles are supported: Canonical (*NVT*), Grand-Canonical (mu VT), isothermal-isobaric ensemble (*NpT*).
 The code is also able to simulate more complex particles such as rods composed by number of single discs.
+
+The code uses Kern-Frenkel interaction potential.
 
 ### Prerequisites
 opengl, SDL
@@ -42,7 +44,7 @@ The above will generate 512 3-patch particles with interaction range 0.1 and the
 ![Snapshot](doc/three_patch.gif)
 
 ### Rods
-![Snapshot](doc/rods.png)
+![Snapshot](doc/rods_c.png)
 
 __Usage:__ patchy2d<br>
 [-n] [--name] {name:} Name<br>
