@@ -1,5 +1,6 @@
 #ifndef MYSDL_H
 #define MYSDL_H
+#include <signal.h>
 typedef struct mySDL{
 	SDL_Window *window;
 	SDL_GLContext glcontext;
@@ -32,4 +33,6 @@ extern void m128d2float(__m128d *a,float *b,int n);
 extern void mySDLsetcolor(float *b,float *color,int n);
 
 extern void save_png(char *name,mySDL *s);
+
+extern void handle_event(mySDL *sdl,volatile sig_atomic_t *safe_exit);
 #endif

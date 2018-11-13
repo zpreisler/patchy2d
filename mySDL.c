@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES
 #include <utils.h>
+#include <signal.h>
 #include "program_gl.h"
 #include "mySDL.h"
 #include <png.h>
@@ -11,13 +12,11 @@
 void mySDLresize(mySDL *s){
 	//Routines for window resizing
 	//////////////////////////////
-	
 	float a;
 	float m=s->scale;
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	glViewport(0,0,s->w,s->h);
 	a=(float)s->h/(float)s->w;
-
 	//FIXME
 	if(a>1.0){
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
@@ -27,7 +26,6 @@ void mySDLresize(mySDL *s){
 		s->proj_matrix=(float[4]){m*a,0.0,0.0,m};
 		s->view_matrix=(float[4]){1,0,0,1};
 	}
-
 	glUseProgram(s->program[0]);
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
 	glUniformMatrix2fv(s->view_matrix_loc,1,GL_FALSE,s->view_matrix);
@@ -37,7 +35,6 @@ void mySDLresize(mySDL *s){
 	glUniformMatrix2fv(s->proj_matrix_loc,1,GL_FALSE,s->proj_matrix);
 	glUniformMatrix2fv(s->view_matrix_loc,1,GL_FALSE,s->view_matrix);
 	glUniform1f(s->uy_loc,s->uy);
-
 	return;
 }
 mySDL *mySDLinit(unsigned int w,unsigned int h){
@@ -100,9 +97,6 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	return s;
 }
 void mySDLpositions(mySDL *s,float *p,int n){
-	//put positions into graphics buffer
-	////////////////////////////////////
-
 	//write positions
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[0]); //Select buffer
@@ -111,13 +105,9 @@ void mySDLpositions(mySDL *s,float *p,int n){
 	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*n*2,p,GL_STREAM_DRAW); //Write into the buffer
 	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(0);
-
 	return;
 }
 void mySDLcolors(mySDL *s,float *c,int n){
-	//put colors into graphics buffer
-	/////////////////////////////////
-
 	//write_colors
 	glBindVertexArray(s->vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[1]); //Select buffer
@@ -126,11 +116,9 @@ void mySDLcolors(mySDL *s,float *c,int n){
 	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*4*n,c,GL_STREAM_DRAW); //Write into the buffer
 	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(1);
-
 	return;
 }
 void mySDLboundary(mySDL *s,float *b){
-
 	//write positions
 	glBindVertexArray(s->vao[1]);
 	glBindBuffer(GL_ARRAY_BUFFER,s->vbo[3]); //Select buffer
@@ -139,13 +127,9 @@ void mySDLboundary(mySDL *s,float *b){
 	glBufferData(GL_ARRAY_BUFFER,sizeof(float)*8,b,GL_STREAM_DRAW); //Write into the buffer
 	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 	glEnableVertexAttribArray(0);
-
 	return;
 }
 void mySDLdisplay(mySDL *s){
-	//Display
-	/////////
-	
 	//Clear
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -164,7 +148,6 @@ void mySDLdisplay(mySDL *s){
 	glDrawArrays(GL_LINE_LOOP,0,4);
 
 	SDL_GL_SwapWindow(s->window);
-
 	return;
 }
 void mySLDbuffer(mySDL *s){
@@ -235,4 +218,17 @@ void save_png(char *name,mySDL *s){
 	png_write_end(png_ptr,png_info);
 	png_destroy_write_struct(&png_ptr,NULL);
 	close_file(f);
+}
+void handle_event(mySDL *sdl,volatile sig_atomic_t *safe_exit){
+	SDL_PollEvent(&sdl->event);
+	switch(sdl->event.type){
+		case SDL_QUIT:
+			*safe_exit=1;
+			break;
+		case SDL_WINDOWEVENT:
+			if(sdl->event.window.event==SDL_WINDOWEVENT_RESIZED){
+				mySDLresize(sdl);
+			}
+			break;
+	}
 }
