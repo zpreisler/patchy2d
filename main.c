@@ -18,16 +18,12 @@ dsfmt_t dsfmt;
 int main(int argc, char *argv[]){
 	//main
 	//////
-	
 	//Initialize header
 	///////////////////
-	
 	header *t=init_header();
 	dsfmt_init_gen_rand(&dsfmt,t->seed);
-
 	//Reading inputs
 	////////////////
-	
 	if(argc==1){
 		usage(stdout,t->argz,*argv);
 		return 0;
@@ -35,24 +31,17 @@ int main(int argc, char *argv[]){
 	printf(">>>Initialized default header\n");
 	input_files *input=find_configurational_files(argc,argv);
 	read_input(argc,argv,input,t);
-
 	//print simulation arguments
 	////////////////////////////
-	
 	dump_args(stdout,t->argz);
-
 #if defined SDL
 	//Graphics
 	//////////
-	
 	mySDL *sdl=NULL;
 	float color[4]={1.0,0.0,0.0,0.333};
-
 	//Allocate memory blocks for the graphics
 	/////////////////////////////////////////
-	
 	if(t->display){
-
 		sdl=mySDLinit((unsigned int)t->screen_geometry[0],(unsigned int)t->screen_geometry[1]);
 		
 		sdl->positions=alloc(sizeof(float)*2*t->nparticle_alloc);
@@ -71,10 +60,8 @@ int main(int argc, char *argv[]){
 		mySDLresize(sdl);
 
 	}
-
 	//Run the simulation
 	////////////////////
-
 	run(t,sdl);
 #else
 	run(t);

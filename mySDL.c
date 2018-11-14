@@ -12,11 +12,11 @@
 void mySDLresize(mySDL *s){
 	//Routines for window resizing
 	//////////////////////////////
-	float a;
-	float m=s->scale;
+	float a,m;
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 	glViewport(0,0,s->w,s->h);
 	a=(float)s->h/(float)s->w;
+	m=s->scale;
 	//FIXME
 	if(a>1.0){
 		s->proj_matrix=(float[4]){m,0.0,0.0,m/a};
@@ -40,8 +40,6 @@ void mySDLresize(mySDL *s){
 mySDL *mySDLinit(unsigned int w,unsigned int h){
 	//Initialize SDL
 	////////////////
-
-	//Allocate
 	mySDL *s=alloc(sizeof(mySDL));
 	s->proj_matrix=alloc(sizeof(float)*4);
 	s->view_matrix=alloc(sizeof(float)*4);
@@ -52,7 +50,6 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4);
 
-	//Init
 	SDL_Init(SDL_INIT_VIDEO);
 
 	//Define window
@@ -65,7 +62,6 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	s->glcontext=SDL_GL_CreateContext(s->window);
 	SDL_GetWindowSize(s->window,&s->w,&s->h);
 
-	//glewInit
 	s->glew_status=glewInit();
 
 	//Create program -- load shaders
@@ -84,7 +80,6 @@ mySDL *mySDLinit(unsigned int w,unsigned int h){
 	glGenBuffers(3,s->vbo); //Generate buffer objects
 
 	//Multisample
-	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_MULTISAMPLE_ARB);
 	glDisable(GL_DEPTH_TEST);
 

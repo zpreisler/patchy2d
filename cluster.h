@@ -11,7 +11,6 @@ extern int find_new_cluster(compound_particle *c,header *t);
 extern int clusters_reset(header *t);
 extern int find_all_clusters(header *t);
 
-extern void color_all_clusters(header *t);
 extern void avg_max_cluster_size(header *t);
 
 #endif
